@@ -1,48 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Upgrade guide — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Upgrade guide — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Upgrade guide</h1>
+<p>This guide covers upgrading MEAT Framework between versions. Follow the steps in order and always back up your database before upgrading.</p>
 
- <main class="docs-content">
- <h1>Upgrade guide</h1>
- <p>Upgrading between versions.</p>
+<h2 id="general">General upgrade process</h2>
+<ol>
+  <li>Read the full changelog for your target version</li>
+  <li>Commit or stash all local changes</li>
+  <li>Update <code>composer.json</code> to the new version constraint</li>
+  <li>Run <code>composer update</code></li>
+  <li>Run <code>php artisan migrate</code> for any database changes</li>
+  <li>Clear caches: <code>php artisan cache:clear &amp;&amp; php artisan route:clear &amp;&amp; php artisan view:clear</code></li>
+  <li>Run your test suite</li>
+</ol>
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
+<h2 id="npm-to-pnpm">npm → pnpm migration</h2>
+<p>MEAT Framework now uses pnpm exclusively. If you are upgrading from a project that used npm:</p>
+<ol>
+  <li>Install pnpm: <code>corepack enable pnpm</code> (or <code>brew install pnpm</code>)</li>
+  <li>Delete <code>node_modules/</code> and <code>package-lock.json</code></li>
+  <li>Run <code>pnpm install</code></li>
+</ol>
+<div class="note"><strong>Known difference:</strong> pnpm 10 does not run dependencies' install scripts by default. <code>@parcel/watcher</code> prints a "Ignored build scripts" warning — this is harmless. The production build, lint, and format checks all work correctly.</div>
 
- <div class="next-prev">
- <a href="contributing.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Contribution guide</span>
- </a>
- <a href="changelog.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Changelog</span>
- </a>
- </div>
- </main>
- </div>
+<h2 id="php8">PHP 8.x compatibility</h2>
+<p>MEAT Framework supports PHP 8.0, 8.1, 8.2, and 8.3. If you are upgrading from PHP 7.x:</p>
+<ul>
+  <li>Replace deprecated <code>each()</code>, <code>create_function()</code>, and <code>ereg_*()</code> calls</li>
+  <li>Named arguments and union types are now available — use them for new code</li>
+  <li>Set <code>APP_DEBUG=false</code> in <code>.env</code> during WordPress installation to suppress PHP 8 compatibility notices from WordPress core itself</li>
+</ul>
 
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+<h2 id="env">Environment variables</h2>
+<p>New variables added to <code>.env.sample</code> in recent versions:</p>
+<pre><code># Docker / container config
+APP_URL_PUBLIC=https://your-public-domain.com
+
+# Queue (if using Horizon)
+HORIZON_PREFIX=my-app
+
+# Multi-environment
+APP_ENV=production  # local | staging | production</code></pre>
+
+<div class="next-prev">
+<a href="contributing.html"><span class="label">&larr; Previous</span><span class="title">Contribution guide</span></a>
+<a href="changelog.html" class="next"><span class="label">Next &rarr;</span><span class="title">Changelog</span></a>
+</div></main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
