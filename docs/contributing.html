@@ -1,48 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Contribution guide — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Contribution guide — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Contribution guide</h1>
+<p>MEAT Framework is open-source (GPL-2+). All contributions are welcome.</p>
+<h2 id="how">Ways to contribute</h2>
+<ul>
+  <li><strong>Report a bug</strong> — open an issue on <a href="https://github.com/digitalmeat/themosis3.0/issues" target="_blank" rel="noopener">GitHub</a> with steps to reproduce</li>
+  <li><strong>Suggest a feature</strong> — open a discussion or issue describing the use case</li>
+  <li><strong>Send a pull request</strong> — fork, make changes on a feature branch, open a PR against <code>main</code></li>
+  <li><strong>Improve docs</strong> — docs site repo: <a href="https://github.com/digitalmeat/meat-framework-docs" target="_blank" rel="noopener">github.com/digitalmeat/meat-framework-docs</a></li>
+</ul>
+<h2 id="pr">Pull request process</h2>
+<ol>
+  <li>Fork <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">github.com/digitalmeat/themosis3.0</a></li>
+  <li><code>git checkout -b feature/my-improvement</code></li>
+  <li>Make changes with clear commit messages</li>
+  <li><code>composer test</code> — all tests must pass</li>
+  <li><code>pnpm lint</code> — no lint errors</li>
+  <li>Push and open the PR against <code>main</code></li>
+</ol>
+<h2 id="setup">Local setup</h2>
+<pre><code>git clone https://github.com/digitalmeat/themosis3.0.git my-project
+cd my-project
+composer install
+cp .env.sample .env
+# fill DATABASE_* in .env
+php artisan key:generate
+php artisan salts:generate
+php artisan migrate
+corepack enable pnpm
+pnpm install
+pnpm build</code></pre>
+<h2 id="style">Code style</h2>
+<p>PHP follows PSR-12. JavaScript/TypeScript follows the project ESLint config. Pre-commit hooks run lint-staged automatically.</p>
 
- <main class="docs-content">
- <h1>Contribution guide</h1>
- <p>How to contribute to MEAT Framework.</p>
-
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
-
- <div class="next-prev">
- <a href="introduction.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Introduction</span>
- </a>
- <a href="upgrade.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Upgrade guide</span>
- </a>
- </div>
- </main>
- </div>
-
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+<div class="next-prev"><a href="introduction.html"><span class="label">&larr; Previous</span><span class="title">Introduction</span></a><a href="upgrade.html" class="next"><span class="label">Next &rarr;</span><span class="title">Upgrade guide</span></a></div>
+</main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
