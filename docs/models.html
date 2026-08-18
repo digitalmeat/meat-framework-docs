@@ -20,20 +20,161 @@
       </nav>
     </div>
   </header>
-
   <div class="docs-layout">
     <div id="sidebar-placeholder"></div>
-
     <main class="docs-content">
       <h1>Models</h1>
-      <p>Eloquent ORM models for WordPress and custom tables.</p>
 
-      <div class="note">
-        <strong>Work in progress.</strong> This section is being expanded.
-        The original Themosis 3.1 reference at
-        <a href="https://framework.themosis.com/docs/3.1/models" target="_blank" rel="noopener">framework.themosis.com/docs/3.1/models</a>
-        remains a valid reference in the meantime.
-      </div>
+      <ul class="toc-list">
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#create">Creating a model</a></li>
+        <li><a href="#wordpress">WordPress tables</a></li>
+        <li><a href="#wp-posts">wp_posts model</a></li>
+        <li><a href="#migrations">Migrations</a></li>
+      </ul>
+
+      <h2 id="introduction">Introduction</h2>
+      <p>
+        MEAT Framework ships with full support for
+        <a href="https://laravel.com/docs/eloquent" target="_blank" rel="noopener">Laravel Eloquent ORM</a>
+        via the <a href="https://github.com/illuminate/database" target="_blank" rel="noopener">illuminate/database</a> package.
+        Eloquent is an ActiveRecord implementation: each database table has a corresponding Model class.
+      </p>
+      <p>Available database tools:</p>
+      <ul>
+        <li><a href="https://laravel.com/docs/queries" target="_blank" rel="noopener">Query Builder</a> — fluent SQL builder</li>
+        <li><a href="https://laravel.com/docs/eloquent" target="_blank" rel="noopener">Eloquent ORM</a> — ActiveRecord models</li>
+        <li><a href="https://laravel.com/docs/migrations" target="_blank" rel="noopener">Migrations</a> — version-controlled schema changes</li>
+        <li><a href="https://laravel.com/docs/eloquent-collections" target="_blank" rel="noopener">Collections</a> — fluent array-like result sets</li>
+      </ul>
+      <p>Database connection is configured in <code>config/database.php</code>. MySQL is the default.</p>
+
+      <h2 id="create">Creating a model</h2>
+      <pre><code>php artisan make:model Book
+
+# With migration
+php artisan make:model Book --migration
+php artisan make:model Book -m</code></pre>
+
+      <p>Models live in <code>app/Models/</code> and extend <code>Illuminate\Database\Eloquent\Model</code>:</p>
+      <pre><code>&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Book extends Model
+{
+    // Eloquent assumes table name = "books" (snake_case plural of class name)
+    // Eloquent assumes primary key = "id"
+    // Eloquent manages created_at / updated_at automatically
+}</code></pre>
+
+      <p>Common model configuration:</p>
+      <pre><code>class Book extends Model
+{
+    // Override table name
+    protected $table = 'library_books';
+
+    // Disable timestamps
+    public $timestamps = false;
+
+    // Mass-assignable fields
+    protected $fillable = ['title', 'author', 'isbn'];
+
+    // Fields hidden from arrays/JSON
+    protected $hidden = ['internal_notes'];
+}</code></pre>
+
+      <h2 id="wordpress">Working with WordPress tables</h2>
+      <p>
+        WordPress uses its own column naming conventions. You need to tell Eloquent about them.
+        The table prefix (e.g. <code>wp_</code>) is handled automatically — never include it in
+        <code>$table</code>.
+      </p>
+
+      <h2 id="wp-posts">The wp_posts table</h2>
+      <pre><code>&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Post extends Model
+{
+    // WordPress table: wp_posts
+    // Eloquent maps "posts" -> "wp_posts" via configured prefix
+    protected $table = 'posts'; // do NOT include prefix
+
+    // WordPress primary key is "ID", not "id"
+    protected $primaryKey = 'ID';
+
+    // WordPress uses different timestamp column names
+    const CREATED_AT = 'post_date';
+    const UPDATED_AT = 'post_modified';
+}
+</code></pre>
+
+      <p>Usage examples:</p>
+      <pre><code>// Get all published posts
+$posts = Post::where('post_status', 'publish')
+             ->where('post_type', 'post')
+             ->orderBy('post_date', 'desc')
+             ->get();
+
+// Find by ID
+$post = Post::find(42);
+
+// Get post meta via a relationship
+class Post extends Model
+{
+    public function meta()
+    {
+        return $this->hasMany(PostMeta::class, 'post_id', 'ID');
+    }
+}</code></pre>
+
+      <h2 id="migrations">Migrations</h2>
+      <pre><code># Create a migration
+php artisan make:migration create_books_table
+
+# Run pending migrations
+php artisan migrate
+
+# Rollback last batch
+php artisan migrate:rollback
+
+# Rebuild from scratch
+php artisan migrate:fresh</code></pre>
+
+      <p>Example migration:</p>
+      <pre><code>use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('books', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->string('author');
+            $table->string('isbn', 20)->unique();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('books');
+    }
+};</code></pre>
+
+      <p>
+        For full Eloquent documentation — relationships, scopes, factories, observers, and more —
+        see the <a href="https://laravel.com/docs/eloquent" target="_blank" rel="noopener">official Laravel docs</a>.
+      </p>
 
       <div class="next-prev">
         <a href="controllers.html">
@@ -45,9 +186,9 @@
           <span class="title">Hooks</span>
         </a>
       </div>
+
     </main>
   </div>
-
   <script src="../assets/js/sidebar.js"></script>
 </body>
 </html>
