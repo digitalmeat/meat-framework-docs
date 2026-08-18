@@ -1,90 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation — MEAT Framework</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../assets/css/style.css" />
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <title>Installation — MEAT Framework</title>
+ <link rel="preconnect" href="https://fonts.googleapis.com" />
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+ <link rel="stylesheet" href="../assets/css/style.css" />
 </head>
 <body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="../index.html" class="logo">
-        <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
-      </a>
-      <nav class="main-nav">
-        <a href="introduction.html">Docs</a>
-        <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
-      </nav>
-    </div>
-  </header>
+ <header class="site-header">
+ <div class="container header-inner">
+ <a href="../index.html" class="logo">
+ <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
+ </a>
+ <nav class="main-nav">
+ <a href="introduction.html">Docs</a>
+ <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
+ </nav>
+ </div>
+ </header>
 
-  <div class="docs-layout">
-    <div id="sidebar-placeholder"></div>
+ <div class="docs-layout">
+ <div id="sidebar-placeholder"></div>
 
-    <main class="docs-content">
-      <h1>Installation</h1>
+ <main class="docs-content">
+ <h1>Installation</h1>
 
-      <ul class="toc-list">
-        <li><a href="#requirements">Requirements</a></li>
-        <li><a href="#install-composer">Composer</a></li>
-        <li><a href="#install-framework">Install framework</a></li>
-        <li><a href="#public-directory">Public directory</a></li>
-        <li><a href="#docker">Docker</a></li>
-        <li><a href="#artisan">Artisan</a></li>
-        <li><a href="#install-theme">Install theme</a></li>
-        <li><a href="#install-wordpress">Install WordPress</a></li>
-      </ul>
+ <ul class="toc-list">
+ <li><a href="#requirements">Requirements</a></li>
+ <li><a href="#install-composer">Composer</a></li>
+ <li><a href="#install-framework">Install framework</a></li>
+ <li><a href="#public-directory">Public directory</a></li>
+ <li><a href="#docker">Docker</a></li>
+ <li><a href="#artisan">Artisan</a></li>
+ <li><a href="#install-theme">Install theme</a></li>
+ <li><a href="#install-wordpress">Install WordPress</a></li>
+ </ul>
 
-      <h2 id="requirements">Requirements</h2>
-      <p>The server requirements are the same as WordPress with a few additions:</p>
-      <ul>
-        <li>PHP &gt;= 8.0 (8.1+ recommended)</li>
-        <li>Composer &gt;= 2.0</li>
-        <li>Intl PHP Extension</li>
-        <li>MySQL 5.7+ or MariaDB 10.3+</li>
-      </ul>
+ <h2 id="requirements">Requirements</h2>
+ <p>The server requirements are the same as WordPress with a few additions:</p>
+ <ul>
+ <li>PHP &gt;= 8.0 (8.1+ recommended)</li>
+ <li>Composer &gt;= 2.0</li>
+ <li>Intl PHP Extension</li>
+ <li>MySQL 5.7+ or MariaDB 10.3+</li>
+ </ul>
 
-      <h2 id="install-composer">Install Composer</h2>
-      <p>
-        MEAT Framework uses <a href="https://getcomposer.org/" target="_blank" rel="noopener">Composer</a>
-        to manage its dependencies. Install it globally if you haven't already:
-      </p>
-      <pre><code># macOS / Linux
+ <h2 id="install-composer">Install Composer</h2>
+ <p>
+ MEAT Framework uses <a href="https://getcomposer.org/" target="_blank" rel="noopener">Composer</a>
+ to manage its dependencies. Install it globally if you haven't already:
+ </p>
+ <pre><code># macOS / Linux
 curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer</code></pre>
 
-      <h2 id="install-framework">Install the MEAT Framework</h2>
-      <p>Open your Terminal and create a new project:</p>
-      <pre><code>composer create-project digitalmeat/meat-framework my-project-name</code></pre>
-      <p>
-        This creates a <code>my-project-name</code> directory and downloads WordPress, the framework,
-        and all its dependencies automatically.
-      </p>
+ <h2 id="install-framework">Install the MEAT Framework</h2>
+ <p>Open your Terminal and create a new project:</p>
+ <pre><code>composer create-project digitalmeat/meat-framework my-project-name</code></pre>
+ <p>
+ This creates a <code>my-project-name</code> directory and downloads WordPress, the framework,
+ and all its dependencies automatically.
+ </p>
 
-      <h2 id="public-directory">The public directory</h2>
-      <p>
-        MEAT Framework is not configured like a classic WordPress installation. The web server
-        must point to the <strong><code>htdocs</code></strong> subdirectory, not the project root.
-      </p>
-      <pre><code># nginx example
+ <h2 id="public-directory">The public directory</h2>
+ <p>
+ MEAT Framework is not configured like a classic WordPress installation. The web server
+ must point to the <strong><code>htdocs</code></strong> subdirectory, not the project root.
+ </p>
+ <pre><code># nginx example
 root /var/www/my-project/htdocs;
 
 # Apache example
 DocumentRoot /var/www/my-project/htdocs</code></pre>
 
-      <h2 id="docker">Docker (recommended)</h2>
-      <p>The framework ships with a production-grade Docker setup. To get started:</p>
-      <pre><code># 1. Create a shared network (first time only)
+ <h2 id="docker">Docker (recommended)</h2>
+ <p>The framework ships with a production-grade Docker setup. To get started:</p>
+ <pre><code># 1. Create a shared network (first time only)
 docker network create -d bridge localnetwork
 
 # 2. Start a MySQL container (first time only)
 docker run --name mysqlserver \
-  -e MYSQL_ROOT_PASSWORD=root \
-  --network localnetwork \
-  -p 3306:3306 --restart=always -d mysql:latest
+ -e MYSQL_ROOT_PASSWORD=root \
+ --network localnetwork \
+ -p 3306:3306 --restart=always -d mysql:latest
 
 # 3. Build and start project containers
 docker-compose build
@@ -92,65 +92,65 @@ docker-compose up
 
 # 4. Install PHP dependencies inside the container
 docker-compose exec app php -d memory_limit=-1 \
-  /usr/local/bin/composer install</code></pre>
+ /usr/local/bin/composer install</code></pre>
 
-      <div class="note">
-        <strong>Note:</strong> For local development without Docker, MEAT Framework supports
-        <a href="https://laravel.com/docs/valet" target="_blank" rel="noopener">Laravel Valet</a>
-        with a bundled local driver. Point Valet at the <code>htdocs</code> directory.
-      </div>
+ <div class="note">
+ <strong>Note:</strong> For local development without Docker, MEAT Framework supports
+ <a href="https://laravel.com/docs/valet" target="_blank" rel="noopener">Laravel Valet</a>
+ with a bundled local driver. Point Valet at the <code>htdocs</code> directory.
+ </div>
 
-      <h2 id="artisan">Artisan CLI</h2>
-      <p>
-        MEAT Framework uses Laravel Artisan as its CLI tool. To see all available commands:
-      </p>
-      <pre><code>php artisan</code></pre>
-      <p>Common commands you'll use often:</p>
-      <pre><code>php artisan key:generate        # Generate APP_KEY
-php artisan salts:generate      # Generate WordPress salts
-php artisan migrate             # Run database migrations
-php artisan make:controller     # Scaffold a controller
-php artisan make:model          # Scaffold a model</code></pre>
+ <h2 id="artisan">Artisan CLI</h2>
+ <p>
+ MEAT Framework uses Laravel Artisan as its CLI tool. To see all available commands:
+ </p>
+ <pre><code>php artisan</code></pre>
+ <p>Common commands you'll use often:</p>
+ <pre><code>php artisan key:generate # Generate APP_KEY
+php artisan salts:generate # Generate WordPress salts
+php artisan migrate # Run database migrations
+php artisan make:controller # Scaffold a controller
+php artisan make:model # Scaffold a model</code></pre>
 
-      <h2 id="install-theme">Install a theme</h2>
-      <p>
-        No default theme is installed on project creation. Install one with:
-      </p>
-      <pre><code>php artisan theme:install my-theme</code></pre>
-      <p>
-        This downloads and installs the theme into
-        <code>htdocs/content/themes/my-theme/</code> and sets it as the active theme.
-      </p>
+ <h2 id="install-theme">Install a theme</h2>
+ <p>
+ No default theme is installed on project creation. Install one with:
+ </p>
+ <pre><code>php artisan theme:install my-theme</code></pre>
+ <p>
+ This downloads and installs the theme into
+ <code>htdocs/content/themes/my-theme/</code> and sets it as the active theme.
+ </p>
 
-      <h2 id="install-wordpress">Configure WordPress</h2>
-      <p>
-        Instead of editing <code>wp-config.php</code>, all configuration lives in a <code>.env</code>
-        file at project root. Copy the sample and fill in your values:
-      </p>
-      <pre><code>cp .env.sample .env</code></pre>
-      <p>Key variables to set:</p>
-      <pre><code>APP_URL=https://my-project.test
+ <h2 id="install-wordpress">Configure WordPress</h2>
+ <p>
+ Instead of editing <code>wp-config.php</code>, all configuration lives in a <code>.env</code>
+ file at project root. Copy the sample and fill in your values:
+ </p>
+ <pre><code>cp .env.sample .env</code></pre>
+ <p>Key variables to set:</p>
+ <pre><code>APP_URL=https://my-project.test
 DATABASE_NAME=my_db
 DATABASE_USER=root
 DATABASE_PASSWORD=secret
 DATABASE_HOST=127.0.0.1</code></pre>
-      <p>
-        See the <a href="configuration.html">Configuration guide</a> for the full reference.
-      </p>
+ <p>
+ See the <a href="configuration.html">Configuration guide</a> for the full reference.
+ </p>
 
-      <div class="next-prev">
-        <a href="introduction.html">
-          <span class="label">← Previous</span>
-          <span class="title">Introduction</span>
-        </a>
-        <a href="configuration.html" class="next">
-          <span class="label">Next →</span>
-          <span class="title">Configuration</span>
-        </a>
-      </div>
-    </main>
-  </div>
+ <div class="next-prev">
+ <a href="introduction.html">
+ <span class="label">← Previous</span>
+ <span class="title">Introduction</span>
+ </a>
+ <a href="configuration.html" class="next">
+ <span class="label">Next →</span>
+ <span class="title">Configuration</span>
+ </a>
+ </div>
+ </main>
+ </div>
 
-  <script src="../assets/js/sidebar.js"></script>
+ <script src="../assets/js/sidebar.js"></script>
 </body>
 </html>

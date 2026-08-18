@@ -1,66 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Routing — MEAT Framework</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../assets/css/style.css" />
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <title>Routing — MEAT Framework</title>
+ <link rel="preconnect" href="https://fonts.googleapis.com" />
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+ <link rel="stylesheet" href="../assets/css/style.css" />
 </head>
 <body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="../index.html" class="logo">
-        <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
-      </a>
-      <nav class="main-nav">
-        <a href="introduction.html">Docs</a>
-        <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
-      </nav>
-    </div>
-  </header>
+ <header class="site-header">
+ <div class="container header-inner">
+ <a href="../index.html" class="logo">
+ <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
+ </a>
+ <nav class="main-nav">
+ <a href="introduction.html">Docs</a>
+ <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
+ </nav>
+ </div>
+ </header>
 
-  <div class="docs-layout">
-    <div id="sidebar-placeholder"></div>
+ <div class="docs-layout">
+ <div id="sidebar-placeholder"></div>
 
-    <main class="docs-content">
-      <h1>Routing</h1>
+ <main class="docs-content">
+ <h1>Routing</h1>
 
-      <ul class="toc-list">
-        <li><a href="#introduction">Introduction</a></li>
-        <li><a href="#basic-routing">Basic routing</a></li>
-        <li><a href="#route-parameters">Route parameters</a></li>
-        <li><a href="#named-routes">Named routes</a></li>
-        <li><a href="#route-groups">Route groups</a></li>
-        <li><a href="#wordpress-routes">WordPress routes</a></li>
-        <li><a href="#conditional-tags">Conditional tags</a></li>
-      </ul>
+ <ul class="toc-list">
+ <li><a href="#introduction">Introduction</a></li>
+ <li><a href="#basic-routing">Basic routing</a></li>
+ <li><a href="#route-parameters">Route parameters</a></li>
+ <li><a href="#named-routes">Named routes</a></li>
+ <li><a href="#route-groups">Route groups</a></li>
+ <li><a href="#wordpress-routes">WordPress routes</a></li>
+ <li><a href="#conditional-tags">Conditional tags</a></li>
+ </ul>
 
-      <h2 id="introduction">Introduction</h2>
-      <p>
-        Routes are defined in <code>routes/web.php</code> at project root.
-        The framework uses <code>illuminate/routing</code> from Laravel — so if you've used
-        Laravel before, this is identical.
-      </p>
-      <p>
-        There are two kinds of routes: <strong>custom URI routes</strong> and
-        <strong>WordPress conditional routes</strong>.
-      </p>
+ <h2 id="introduction">Introduction</h2>
+ <p>
+ Routes are defined in <code>routes/web.php</code> at project root.
+ The framework uses <code>illuminate/routing</code> from Laravel — so if you've used
+ Laravel before, this is identical.
+ </p>
+ <p>
+ There are two kinds of routes: <strong>custom URI routes</strong> and
+ <strong>WordPress conditional routes</strong>.
+ </p>
 
-      <h2 id="basic-routing">Basic routing</h2>
-      <pre><code>// Custom URI route
+ <h2 id="basic-routing">Basic routing</h2>
+ <pre><code>// Custom URI route
 Route::get('contact', function () {
-    return view('contact');
+ return view('contact');
 });
 
 // WordPress conditional route
 Route::any('single', function ($post, $query) {
-    return view('single', ['post' => $post]);
+ return view('single', ['post' => $post]);
 });</code></pre>
 
-      <h3>Router methods</h3>
-      <pre><code>Route::get($uri, $callback);
+ <h3>Router methods</h3>
+ <pre><code>Route::get($uri, $callback);
 Route::post($uri, $callback);
 Route::put($uri, $callback);
 Route::patch($uri, $callback);
@@ -73,47 +73,47 @@ Route::any($uri, $callback);
 // Match specific verbs
 Route::match(['GET', 'POST'], $uri, $callback);</code></pre>
 
-      <div class="callout">
-        <p>
-          <strong>Tip:</strong> Use <code>Route::any()</code> for WordPress conditional routes.
-          The WordPress Customizer fetches pages via HTTP POST, so <code>Route::get()</code>
-          alone produces a blank screen there.
-        </p>
-      </div>
+ <div class="callout">
+ <p>
+ <strong>Tip:</strong> Use <code>Route::any()</code> for WordPress conditional routes.
+ The WordPress Customizer fetches pages via HTTP POST, so <code>Route::get()</code>
+ alone produces a blank screen there.
+ </p>
+ </div>
 
-      <h3>View routes</h3>
-      <pre><code>Route::view('/contact', 'contact');
+ <h3>View routes</h3>
+ <pre><code>Route::view('/contact', 'contact');
 Route::view('/contact', 'contact', ['team' => 'Support']);</code></pre>
 
-      <h2 id="route-parameters">Route parameters</h2>
-      <pre><code>// Required parameter
+ <h2 id="route-parameters">Route parameters</h2>
+ <pre><code>// Required parameter
 Route::get('/projects/{id}', function ($id) {
-    return 'Project ' . $id;
+ return 'Project ' . $id;
 });
 
 // Optional parameter
 Route::get('projects/{id?}', function ($id = 0) {
-    return 'One or all projects';
+ return 'One or all projects';
 });
 
 // Regex constraint
 Route::get('user/{id}', function ($id) {
-    return 'User ' . $id;
+ return 'User ' . $id;
 })->where('id', '[0-9]+');</code></pre>
 
-      <div class="note">
-        <strong>Note:</strong> Route parameters are <em>not</em> available to WordPress conditional
-        routes. Those receive the WordPress globals <code>$post</code> and <code>$query</code> instead.
-      </div>
+ <div class="note">
+ <strong>Note:</strong> Route parameters are <em>not</em> available to WordPress conditional
+ routes. Those receive the WordPress globals <code>$post</code> and <code>$query</code> instead.
+ </div>
 
-      <h3>$post and $query on WordPress routes</h3>
-      <pre><code>Route::any('page', function ($post, $query) {
-    return view('page', ['page' => $post]);
+ <h3>$post and $query on WordPress routes</h3>
+ <pre><code>Route::any('page', function ($post, $query) {
+ return view('page', ['page' => $post]);
 });</code></pre>
 
-      <h2 id="named-routes">Named routes</h2>
-      <pre><code>Route::get('user/profile', function () {
-    //
+ <h2 id="named-routes">Named routes</h2>
+ <pre><code>Route::get('user/profile', function () {
+ //
 })->name('profile');
 
 // Generate URL from name
@@ -122,93 +122,93 @@ $url = route('profile');
 // With parameters
 $url = route('profile', ['id' => 1]);</code></pre>
 
-      <h2 id="route-groups">Route groups</h2>
-      <pre><code>// Middleware group
+ <h2 id="route-groups">Route groups</h2>
+ <pre><code>// Middleware group
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', function () { /* ... */ });
-    Route::get('/settings', function () { /* ... */ });
+ Route::get('/dashboard', function () { /* ... */ });
+ Route::get('/settings', function () { /* ... */ });
 });
 
 // Namespace group
 Route::namespace('Admin')->group(function () {
-    // Controllers in App\Http\Controllers\Admin
+ // Controllers in App\Http\Controllers\Admin
 });
 
 // Prefix group
 Route::prefix('admin')->group(function () {
-    Route::get('users', function () {
-        // Matches /admin/users
-    });
+ Route::get('users', function () {
+ // Matches /admin/users
+ });
 });</code></pre>
 
-      <h2 id="wordpress-routes">WordPress routes</h2>
-      <p>
-        WordPress routes use <a href="https://developer.wordpress.org/themes/basics/conditional-tags/" target="_blank" rel="noopener">WordPress conditional tags</a>
-        as the URI. The framework maps each condition to its core <code>is_*()</code> function.
-      </p>
+ <h2 id="wordpress-routes">WordPress routes</h2>
+ <p>
+ WordPress routes use <a href="https://developer.wordpress.org/themes/basics/conditional-tags/" target="_blank" rel="noopener">WordPress conditional tags</a>
+ as the URI. The framework maps each condition to its core <code>is_*()</code> function.
+ </p>
 
-      <h3>Home &amp; front page</h3>
-      <pre><code>// Blog main page (is_home())
+ <h3>Home &amp; front page</h3>
+ <pre><code>// Blog main page (is_home())
 Route::any('home', function ($post, $query) {
-    return view('home');
+ return view('home');
 });
 
 // Static front page (is_front_page())
 Route::any('front', function ($post, $query) {
-    return view('front');
+ return view('front');
 });</code></pre>
 
-      <h3>Pages</h3>
-      <pre><code>// All pages
+ <h3>Pages</h3>
+ <pre><code>// All pages
 Route::any('page', function ($post, $query) {
-    return view('page');
+ return view('page');
 });
 
 // Specific page by slug
 Route::any('page', ['contact', function ($post, $query) {
-    return view('contact');
+ return view('contact');
 }]);
 
 // Multiple pages
 Route::any('page', [['about', 'contact', 24], function ($post, $query) {
-    return view('info-page');
+ return view('info-page');
 }]);</code></pre>
 
-      <h3>Single posts</h3>
-      <pre><code>// All single posts
+ <h3>Single posts</h3>
+ <pre><code>// All single posts
 Route::any('single', function ($post, $query) {
-    return view('single');
+ return view('single');
 });
 
 // Specific post by slug
 Route::any('single', ['welcome-post', function ($post, $query) {
-    return view('welcome');
+ return view('welcome');
 }]);</code></pre>
 
-      <h3>Custom post types</h3>
-      <pre><code>// Single CPT post
+ <h3>Custom post types</h3>
+ <pre><code>// Single CPT post
 Route::any('singular', ['my-cpt', function ($post, $query) {
-    return view('cpt-single');
+ return view('cpt-single');
 }]);
 
 // CPT archive
 Route::any('post-type-archive', ['my-cpt', function ($post, $query) {
-    return view('cpt-archive');
+ return view('cpt-archive');
 }]);</code></pre>
 
-      <h3>Taxonomies</h3>
-      <pre><code>// Category archive
+ <h3>Taxonomies</h3>
+ <pre><code>// Category archive
 Route::any('category', function ($post, $query) {
-    return view('category');
+ return view('category');
 });
 
 // Custom taxonomy
 Route::any('tax', ['my-taxonomy', function ($post, $query) {
-    return view('tax-archive');
+ return view('tax-archive');
 }]);</code></pre>
 
-      <h2 id="conditional-tags">Available conditional tags</h2>
-      <pre><code>'404'
+ <h2 id="conditional-tags">Available conditional tags</h2>
+ <pre><code>'404'
 'archive'
 'attachment'
 'author'
@@ -231,28 +231,28 @@ Route::any('tax', ['my-taxonomy', function ($post, $query) {
 'time'
 'year'</code></pre>
 
-      <p>
-        You can add custom conditions (e.g. WooCommerce) in <code>config/app.php</code>:
-      </p>
-      <pre><code>'conditions' => [
-    // existing conditions...
-    'is_shop'    => 'shop',
-    'is_product' => 'product',
+ <p>
+ You can add custom conditions (e.g. WooCommerce) in <code>config/app.php</code>:
+ </p>
+ <pre><code>'conditions' => [
+ // existing conditions...
+ 'is_shop' => 'shop',
+ 'is_product' => 'product',
 ],</code></pre>
 
-      <div class="next-prev">
-        <a href="structure.html">
-          <span class="label">← Previous</span>
-          <span class="title">Application structure</span>
-        </a>
-        <a href="middleware.html" class="next">
-          <span class="label">Next →</span>
-          <span class="title">Middleware</span>
-        </a>
-      </div>
-    </main>
-  </div>
+ <div class="next-prev">
+ <a href="structure.html">
+ <span class="label">← Previous</span>
+ <span class="title">Application structure</span>
+ </a>
+ <a href="middleware.html" class="next">
+ <span class="label">Next →</span>
+ <span class="title">Middleware</span>
+ </a>
+ </div>
+ </main>
+ </div>
 
-  <script src="../assets/js/sidebar.js"></script>
+ <script src="../assets/js/sidebar.js"></script>
 </body>
 </html>

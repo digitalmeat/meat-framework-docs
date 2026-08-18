@@ -1,49 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PostType — MEAT Framework</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../assets/css/style.css" />
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <title>PostType — MEAT Framework</title>
+ <link rel="preconnect" href="https://fonts.googleapis.com" />
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+ <link rel="stylesheet" href="../assets/css/style.css" />
 </head>
 <body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="../index.html" class="logo">
-        <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
-      </a>
-      <nav class="main-nav">
-        <a href="introduction.html">Docs</a>
-        <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
-      </nav>
-    </div>
-  </header>
-  <div class="docs-layout">
-    <div id="sidebar-placeholder"></div>
-    <main class="docs-content">
-      <h1>PostType</h1>
+ <header class="site-header">
+ <div class="container header-inner">
+ <a href="../index.html" class="logo">
+ <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
+ </a>
+ <nav class="main-nav">
+ <a href="introduction.html">Docs</a>
+ <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
+ </nav>
+ </div>
+ </header>
+ <div class="docs-layout">
+ <div id="sidebar-placeholder"></div>
+ <main class="docs-content">
+ <h1>PostType</h1>
 
-      <ul class="toc-list">
-        <li><a href="#introduction">Introduction</a></li>
-        <li><a href="#basic">Basic registration</a></li>
-        <li><a href="#labels">Labels</a></li>
-        <li><a href="#arguments">Arguments</a></li>
-        <li><a href="#getters">Getters</a></li>
-        <li><a href="#container">Service container</a></li>
-        <li><a href="#status">Custom statuses</a></li>
-      </ul>
+ <ul class="toc-list">
+ <li><a href="#introduction">Introduction</a></li>
+ <li><a href="#basic">Basic registration</a></li>
+ <li><a href="#labels">Labels</a></li>
+ <li><a href="#arguments">Arguments</a></li>
+ <li><a href="#getters">Getters</a></li>
+ <li><a href="#container">Service container</a></li>
+ <li><a href="#status">Custom statuses</a></li>
+ </ul>
 
-      <h2 id="introduction">Introduction</h2>
-      <p>
-        The <code>PostType</code> facade provides a fluent API to register and manage
-        WordPress custom post types. Register them inside a
-        <a href="hooks.html">Hookable</a> class so they load before WordPress is ready.
-      </p>
+ <h2 id="introduction">Introduction</h2>
+ <p>
+ The <code>PostType</code> facade provides a fluent API to register and manage
+ WordPress custom post types. Register them inside a
+ <a href="hooks.html">Hookable</a> class so they load before WordPress is ready.
+ </p>
 
-      <h2 id="basic">Basic registration</h2>
-      <pre><code>&lt;?php
+ <h2 id="basic">Basic registration</h2>
+ <pre><code>&lt;?php
 
 namespace App\Hooks;
 
@@ -52,62 +52,62 @@ use Meat\Support\Facades\PostType;
 
 class Books extends Hookable
 {
-    public function register(): void
-    {
-        PostType::make('books', 'Books', 'Book')->set();
-    }
+ public function register(): void
+ {
+ PostType::make('books', 'Books', 'Book')->set();
+ }
 }</code></pre>
 
-      <p>Register in <code>config/app.php</code>:</p>
-      <pre><code>'hooks' => [
-    App\Hooks\Books::class,
+ <p>Register in <code>config/app.php</code>:</p>
+ <pre><code>'hooks' => [
+ App\Hooks\Books::class,
 ],</code></pre>
 
-      <div class="note">
-        <strong>Important:</strong> The custom post type will only be registered once you call <code>set()</code>.
-      </div>
+ <div class="note">
+ <strong>Important:</strong> The custom post type will only be registered once you call <code>set()</code>.
+ </div>
 
-      <h3>make() signature</h3>
-      <pre><code>PostType::make(string $slug, string $pluralName, string $singularName)</code></pre>
+ <h3>make() signature</h3>
+ <pre><code>PostType::make(string $slug, string $pluralName, string $singularName)</code></pre>
 
-      <h2 id="labels">Labels</h2>
-      <p>
-        <code>make()</code> pre-fills the standard labels from the plural and singular names.
-        Override specific labels with <code>setLabels()</code>:
-      </p>
-      <pre><code>PostType::make('books', 'Books', 'Book')
-    ->setLabels([
-        'add_new_item'  => __('Add a book', 'textdomain'),
-        'edit_item'     => __('Edit book', 'textdomain'),
-        'not_found'     => __('No books found', 'textdomain'),
-    ])
-    ->set();</code></pre>
+ <h2 id="labels">Labels</h2>
+ <p>
+ <code>make()</code> pre-fills the standard labels from the plural and singular names.
+ Override specific labels with <code>setLabels()</code>:
+ </p>
+ <pre><code>PostType::make('books', 'Books', 'Book')
+ ->setLabels([
+ 'add_new_item' => __('Add a book', 'textdomain'),
+ 'edit_item' => __('Edit book', 'textdomain'),
+ 'not_found' => __('No books found', 'textdomain'),
+ ])
+ ->set();</code></pre>
 
-      <h2 id="arguments">Customizing arguments</h2>
-      <p>
-        Pass any argument from
-        <a href="https://developer.wordpress.org/reference/functions/register_post_type/" target="_blank" rel="noopener">register_post_type()</a>
-        to <code>setArguments()</code>:
-      </p>
-      <pre><code>PostType::make('books', 'Books', 'Book')
-    ->setArguments([
-        'public'        => true,
-        'has_archive'   => true,
-        'menu_position' => 20,
-        'menu_icon'     => 'dashicons-book-alt',
-        'supports'      => ['title', 'editor', 'thumbnail', 'custom-fields'],
-        'rewrite'       => ['slug' => 'books'],
-        'show_in_rest'  => true, // enables Gutenberg + REST API
-    ])
-    ->setTitlePlaceholder('Enter book title...')
-    ->set();</code></pre>
+ <h2 id="arguments">Customizing arguments</h2>
+ <p>
+ Pass any argument from
+ <a href="https://developer.wordpress.org/reference/functions/register_post_type/" target="_blank" rel="noopener">register_post_type()</a>
+ to <code>setArguments()</code>:
+ </p>
+ <pre><code>PostType::make('books', 'Books', 'Book')
+ ->setArguments([
+ 'public' => true,
+ 'has_archive' => true,
+ 'menu_position' => 20,
+ 'menu_icon' => 'dashicons-book-alt',
+ 'supports' => ['title', 'editor', 'thumbnail', 'custom-fields'],
+ 'rewrite' => ['slug' => 'books'],
+ 'show_in_rest' => true, // enables Gutenberg + REST API
+ ])
+ ->setTitlePlaceholder('Enter book title...')
+ ->set();</code></pre>
 
-      <h2 id="getters">Getters</h2>
-      <pre><code>$books = PostType::make('books', 'Books', 'Book')->set();
+ <h2 id="getters">Getters</h2>
+ <pre><code>$books = PostType::make('books', 'Books', 'Book')->set();
 
 // Name / slug
-$slug = $books->getName();   // 'books'
-$slug = $books->getSlug();   // 'books'
+$slug = $books->getName(); // 'books'
+$slug = $books->getSlug(); // 'books'
 
 // All arguments
 $args = $books->getArguments();
@@ -124,70 +124,70 @@ $label = $books->getLabel('add_new_item');
 // The WP_Post_Type instance
 $wpType = $books->getInstance();</code></pre>
 
-      <h2 id="container">Service container</h2>
-      <p>
-        Each registered post type is bound in the
-        <a href="https://github.com/illuminate/container" target="_blank" rel="noopener">illuminate/container</a>
-        as <code>meat.posttype.{slug}</code>:
-      </p>
-      <pre><code>// Via helper
+ <h2 id="container">Service container</h2>
+ <p>
+ Each registered post type is bound in the
+ <a href="https://github.com/illuminate/container" target="_blank" rel="noopener">illuminate/container</a>
+ as <code>meat.posttype.{slug}</code>:
+ </p>
+ <pre><code>// Via helper
 $books = app('meat.posttype.books');
 
 // Via facade
 use Illuminate\Support\Facades\App;
 $books = App::make('meat.posttype.books');</code></pre>
 
-      <h2 id="status">Custom statuses</h2>
-      <p>
-        Add custom publish statuses to your post type with <code>status()</code>.
-        When custom statuses are added, all defaults except <code>draft</code> and <code>trash</code> are removed.
-        The first defined status acts as the "Publish" action.
-      </p>
+ <h2 id="status">Custom statuses</h2>
+ <p>
+ Add custom publish statuses to your post type with <code>status()</code>.
+ When custom statuses are added, all defaults except <code>draft</code> and <code>trash</code> are removed.
+ The first defined status acts as the "Publish" action.
+ </p>
 
-      <h3>Single status</h3>
-      <pre><code>PostType::make('books', 'Books', 'Book')
-    ->status('rent', [
-        'publish_text' => __('List for rent', 'textdomain')
-    ])
-    ->set();</code></pre>
+ <h3>Single status</h3>
+ <pre><code>PostType::make('books', 'Books', 'Book')
+ ->status('rent', [
+ 'publish_text' => __('List for rent', 'textdomain')
+ ])
+ ->set();</code></pre>
 
-      <h3>Multiple statuses</h3>
-      <pre><code>PostType::make('books', 'Books', 'Book')
-    ->status([
-        'rent' => [
-            'publish_text' => 'Save and list for rent'
-        ],
-        'rented' => [
-            'publish_text' => 'Mark as rented'
-        ],
-        'sell' => [
-            'publish_text' => 'List for sale'
-        ],
-        'sold' => [
-            'publish_text' => 'Mark as sold'
-        ],
-    ])
-    ->set();</code></pre>
+ <h3>Multiple statuses</h3>
+ <pre><code>PostType::make('books', 'Books', 'Book')
+ ->status([
+ 'rent' => [
+ 'publish_text' => 'Save and list for rent'
+ ],
+ 'rented' => [
+ 'publish_text' => 'Mark as rented'
+ ],
+ 'sell' => [
+ 'publish_text' => 'List for sale'
+ ],
+ 'sold' => [
+ 'publish_text' => 'Mark as sold'
+ ],
+ ])
+ ->set();</code></pre>
 
-      <p>
-        Status properties follow the same API as
-        <a href="https://developer.wordpress.org/reference/functions/register_post_status/" target="_blank" rel="noopener">register_post_status()</a>.
-        The additional <code>publish_text</code> property overrides the "Publish" button label for that specific status.
-      </p>
+ <p>
+ Status properties follow the same API as
+ <a href="https://developer.wordpress.org/reference/functions/register_post_status/" target="_blank" rel="noopener">register_post_status()</a>.
+ The additional <code>publish_text</code> property overrides the "Publish" button label for that specific status.
+ </p>
 
-      <div class="next-prev">
-        <a href="page.html">
-          <span class="label">&larr; Previous</span>
-          <span class="title">Page</span>
-        </a>
-        <a href="taxonomy.html" class="next">
-          <span class="label">Next &rarr;</span>
-          <span class="title">Taxonomy</span>
-        </a>
-      </div>
+ <div class="next-prev">
+ <a href="page.html">
+ <span class="label">&larr; Previous</span>
+ <span class="title">Page</span>
+ </a>
+ <a href="taxonomy.html" class="next">
+ <span class="label">Next &rarr;</span>
+ <span class="title">Taxonomy</span>
+ </a>
+ </div>
 
-    </main>
-  </div>
-  <script src="../assets/js/sidebar.js"></script>
+ </main>
+ </div>
+ <script src="../assets/js/sidebar.js"></script>
 </body>
 </html>
