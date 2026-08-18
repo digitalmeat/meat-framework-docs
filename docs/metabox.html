@@ -1,48 +1,77 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Metabox — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Metabox — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Metabox</h1>
+<p>The <code>Metabox</code> facade registers custom WordPress metaboxes for any post type.</p>
+<h2 id="basic">Basic usage</h2>
+<pre><code>use Meat\Support\Facades\Metabox;
 
- <main class="docs-content">
- <h1>Metabox</h1>
- <p>Custom metabox registration.</p>
+Metabox::make('properties', 'post')-&gt;set();
+Metabox::make('properties', ['post', 'page'])-&gt;set();</code></pre>
+<h3>Title, context &amp; priority</h3>
+<pre><code>Metabox::make('properties', 'post')
+    -&gt;setTitle(_x('Product details', 'metabox', 'textdomain'))
+    -&gt;setContext('side')    // 'normal' (default) | 'side' | 'advanced'
+    -&gt;setPriority('high')  // 'default' | 'high' | 'low'
+    -&gt;set();</code></pre>
+<h2 id="fields">Custom fields</h2>
+<p>Fields are managed via a REST API and React components. Use <a href="field.html">Field</a> instances:</p>
+<pre><code>use Meat\Support\Facades\Field;
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
+Metabox::make('book_details', 'post')
+    -&gt;setPrefix('book_')
+    -&gt;add(Field::text('author'))
+    -&gt;add(Field::text('isbn'))
+    -&gt;add(Field::integer('year'))
+    -&gt;set();</code></pre>
+<h3>Grouped fields (tabs)</h3>
+<pre><code>use Meat\Support\Section;
 
- <div class="next-prev">
- <a href="form.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Form</span>
- </a>
- <a href="page.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Page</span>
- </a>
- </div>
- </main>
- </div>
+Metabox::make('book_details', 'post')
+    -&gt;add(new Section('general', 'General', [
+        Field::text('author'), Field::text('publisher'),
+    ]))
+    -&gt;add(new Section('meta', 'Details', [
+        Field::text('isbn'), Field::media('cover'),
+    ]))
+    -&gt;set();</code></pre>
+<h2 id="validation">Validation</h2>
+<p>Uses <a href="https://laravel.com/docs/validation" target="_blank" rel="noopener">illuminate/validation</a>:</p>
+<pre><code>Metabox::make('settings', 'post')
+    -&gt;add(Field::text('author', [
+        'rules'    =&gt; 'required|min:3',
+        'messages' =&gt; ['required' =&gt; 'Author name is required.'],
+    ]))
+    -&gt;set();</code></pre>
+<h2 id="retrieve">Retrieve data</h2>
+<pre><code>// Field stored with prefix "book_"
+$author = get_post_meta($post_id, 'book_author', true);</code></pre>
+<h2 id="custom">Custom UI callback</h2>
+<pre><code>Metabox::make('custom', 'post')
+    -&gt;setCallback(function($args) {
+        return view('admin.metabox.custom', [
+            'post'    =&gt; $args['post'],
+            'metabox' =&gt; $args['metabox'],
+        ]);
+    })-&gt;set();</code></pre>
+<h2 id="access">Capability &amp; template restrictions</h2>
+<pre><code>Metabox::make('advanced', 'post')
+    -&gt;setCapability('manage_options')
+    -&gt;setTemplate(['featured', 'wide'], 'page')
+    -&gt;set();</code></pre>
 
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+<div class="next-prev">
+<a href="form.html"><span class="label">&larr; Previous</span><span class="title">Form</span></a>
+<a href="page.html" class="next"><span class="label">Next &rarr;</span><span class="title">Page</span></a>
+</div></main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
