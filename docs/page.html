@@ -1,48 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Page — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Page — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Page</h1>
+<p>The <code>Page</code> facade creates WordPress admin options pages — custom panels outside any post type.</p>
+<h2 id="basic">Basic usage</h2>
+<pre><code>use Meat\Support\Facades\Page;
 
- <main class="docs-content">
- <h1>Page</h1>
- <p>WordPress options pages (settings panels).</p>
+Page::make('Theme Options', 'theme-options')-&gt;set();</code></pre>
+<h2 id="fields">Add settings fields</h2>
+<pre><code>use Meat\Support\Facades\{Page, Field};
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
+Page::make('Theme Options', 'theme-options')
+    -&gt;setPrefix('theme_')
+    -&gt;add(Field::text('tagline'))
+    -&gt;add(Field::media('logo'))
+    -&gt;add(Field::color('primary_color'))
+    -&gt;add(Field::checkbox('maintenance_mode'))
+    -&gt;set();</code></pre>
+<h2 id="sections">Organized sections (tabs)</h2>
+<pre><code>use Meat\Support\Section;
 
- <div class="next-prev">
- <a href="metabox.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Metabox</span>
- </a>
- <a href="posttype.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">PostType</span>
- </a>
- </div>
- </main>
- </div>
+Page::make('Theme Options', 'theme-options')
+    -&gt;add(new Section('general', 'General', [
+        Field::text('tagline'),
+        Field::media('logo'),
+    ]))
+    -&gt;add(new Section('colors', 'Colors', [
+        Field::color('primary'),
+        Field::color('secondary'),
+    ]))
+    -&gt;set();</code></pre>
+<h2 id="subpage">Sub-pages</h2>
+<pre><code>$parent = Page::make('MEAT Options', 'meat-options')-&gt;set();
 
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+Page::make('Advanced', 'meat-options-advanced')
+    -&gt;setParent($parent)
+    -&gt;setCapability('manage_options')
+    -&gt;add(Field::textarea('custom_css'))
+    -&gt;set();</code></pre>
+<h2 id="retrieve">Retrieve settings</h2>
+<pre><code>// Fields are stored as WP options prefixed by setPrefix() value
+$tagline = get_option('theme_tagline');
+$logo    = get_option('theme_logo');</code></pre>
+
+<div class="next-prev"><a href="metabox.html"><span class="label">&larr; Previous</span><span class="title">Metabox</span></a><a href="posttype.html" class="next"><span class="label">Next &rarr;</span><span class="title">PostType</span></a></div>
+</main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
