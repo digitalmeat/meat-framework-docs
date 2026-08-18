@@ -1,48 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Database — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Database — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Database</h1>
+<p>MEAT Framework includes <a href="https://github.com/illuminate/database" target="_blank" rel="noopener">illuminate/database</a> providing the <a href="https://laravel.com/docs/queries" target="_blank" rel="noopener">Query Builder</a>, <a href="https://laravel.com/docs/eloquent" target="_blank" rel="noopener">Eloquent ORM</a>, <a href="https://laravel.com/docs/migrations" target="_blank" rel="noopener">Migrations</a>, and <a href="https://laravel.com/docs/eloquent-collections" target="_blank" rel="noopener">Collections</a>.</p>
+<h2 id="config">Configuration</h2>
+<p>MySQL is the default. Configure in <code>config/database.php</code>. Connection credentials come from <code>.env</code>:</p>
+<pre><code>DATABASE_NAME=my_db
+DATABASE_USER=root
+DATABASE_PASSWORD=secret
+DATABASE_HOST=127.0.0.1
+DATABASE_PREFIX=wp_</code></pre>
+<h2 id="query">Query Builder</h2>
+<pre><code>use Illuminate\Support\Facades\DB;
 
- <main class="docs-content">
- <h1>Database</h1>
- <p>Database connections, migrations, and queries.</p>
+$posts = DB::table('posts')
+    -&gt;where('post_status', 'publish')
+    -&gt;where('post_type', 'post')
+    -&gt;orderBy('post_date', 'desc')
+    -&gt;limit(10)
+    -&gt;get();
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
+$post = DB::table('posts')-&gt;find(42);</code></pre>
+<h2 id="migrations">Migrations</h2>
+<pre><code># Create migration file
+php artisan make:migration create_customers_table
 
- <div class="next-prev">
- <a href="console.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Console</span>
- </a>
- <a href="errors.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Error handling</span>
- </a>
- </div>
- </main>
- </div>
+# Run all pending migrations
+php artisan migrate
 
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+# Rollback last batch
+php artisan migrate:rollback
+
+# Show status
+php artisan migrate:status</code></pre>
+<div class="callout"><p><strong>Warning:</strong> <code>php artisan migrate:fresh</code> drops ALL tables including WordPress tables. Use with extreme caution.</p></div>
+<p>Migration example:</p>
+<pre><code>use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up(): void {
+        Schema::create('customers', function(Blueprint $table) {
+            $table-&gt;id();
+            $table-&gt;string('name');
+            $table-&gt;string('email')-&gt;unique();
+            $table-&gt;timestamps();
+        });
+    }
+    public function down(): void { Schema::dropIfExists('customers'); }
+};</code></pre>
+<p>For the full API see <a href="https://laravel.com/docs/database" target="_blank" rel="noopener">Laravel Database</a> and <a href="https://laravel.com/docs/eloquent" target="_blank" rel="noopener">Eloquent ORM</a> documentation.</p>
+
+<div class="next-prev">
+<a href="console.html"><span class="label">&larr; Previous</span><span class="title">Console</span></a>
+<a href="errors.html" class="next"><span class="label">Next &rarr;</span><span class="title">Error handling</span></a>
+</div></main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
