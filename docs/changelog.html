@@ -1,48 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Changelog — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Changelog — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Changelog</h1>
+<p>Release history for MEAT Framework. Maintained by <a href="https://github.com/digitalmeat" target="_blank" rel="noopener">Digital MEAT</a>.</p>
 
- <main class="docs-content">
- <h1>Changelog</h1>
- <p>Release history and changes.</p>
+<h2 id="v3-1-x">3.1.x — Current (active maintenance)</h2>
+<p>MEAT Framework picks up where the original codebase left off, focusing on stability, PHP 8.x compatibility, and security maintenance.</p>
+<ul>
+  <li>PHP 8.1 / 8.2 / 8.3 compatibility fixes</li>
+  <li>Migrated package manager from npm/yarn to <strong>pnpm</strong> (<code>pnpm@10</code> via Corepack)</li>
+  <li>Replaced <code>package-lock.json</code> with <code>pnpm-lock.yaml</code> — lockfile is now committed</li>
+  <li>Vite build pipeline (<code>pnpm build</code>, <code>pnpm watch</code>)</li>
+  <li>Docker Compose setup for local development</li>
+  <li>Security patch: updated <code>vlucas/phpdotenv</code>, <code>illuminate/*</code> dependencies to latest compatible versions</li>
+  <li>Pre-commit hook now uses <code>pnpm exec lint-staged</code></li>
+</ul>
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
+<h2 id="commands">pnpm command reference</h2>
+<pre><code>corepack enable pnpm    # install pnpm via Corepack (one-time)
+pnpm install            # install dependencies
+pnpm build              # production build
+pnpm watch              # watch mode
+pnpm exec &lt;bin&gt;         # run a local binary (replaces npx)</code></pre>
 
- <div class="next-prev">
- <a href="upgrade.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Upgrade guide</span>
- </a>
- <a href="introduction.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Introduction</span>
- </a>
- </div>
- </main>
- </div>
+<h2 id="upstream">Original codebase lineage</h2>
+<p>MEAT Framework is based on the 3.1 release of the original WordPress + Laravel stack. The framework uses the following core packages:</p>
+<ul>
+  <li><a href="https://github.com/illuminate/routing" target="_blank" rel="noopener">illuminate/routing</a></li>
+  <li><a href="https://github.com/illuminate/database" target="_blank" rel="noopener">illuminate/database</a></li>
+  <li><a href="https://github.com/illuminate/view" target="_blank" rel="noopener">illuminate/view</a></li>
+  <li><a href="https://github.com/illuminate/container" target="_blank" rel="noopener">illuminate/container</a></li>
+  <li><a href="https://github.com/vlucas/phpdotenv" target="_blank" rel="noopener">vlucas/phpdotenv</a></li>
+</ul>
 
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+<div class="next-prev">
+<a href="upgrade.html"><span class="label">&larr; Previous</span><span class="title">Upgrade guide</span></a>
+<a href="introduction.html" class="next"><span class="label">Next &rarr;</span><span class="title">Introduction</span></a>
+</div></main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
