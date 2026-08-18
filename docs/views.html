@@ -1,48 +1,68 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Views — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Views — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Views</h1>
+<p>MEAT Framework uses <a href="https://github.com/illuminate/view" target="_blank" rel="noopener">illuminate/view</a> with two template engines: <a href="blade.html">Blade</a> and <a href="twig.html">Twig</a>.</p>
+<p>Views are loaded from your theme's <code>views/</code> directory and <code>resources/views/</code> at project root. Add directories in <code>config/view.php</code> or <code>config/theme.php</code>.</p>
+<h2 id="create">Creating &amp; rendering views</h2>
+<pre><code>// Routes
+Route::any('front', function($post, $query) {
+    return view('pages.home', ['name' =&gt; 'World']);
+});
 
- <main class="docs-content">
- <h1>Views</h1>
- <p>View files, passing data, and the view helper.</p>
+// Controller
+public function index() { return view('pages.home', ['posts' =&gt; get_posts()]); }
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
+// Render to string (e.g. emails)
+$html = view('emails.receipt', ['order' =&gt; $order])-&gt;render();
+wp_mail($to, 'Receipt', $html);</code></pre>
+<div class="note">No need to call <code>render()</code> when returning from a route or controller — the framework handles it.</div>
+<h2 id="organize">Organize with dot notation</h2>
+<pre><code>return view('pages.about');         // views/pages/about.blade.php
+return view('emails.confirm');      // views/emails/confirm.blade.php
+return view('partials.card');       // views/partials/card.blade.php</code></pre>
+<h2 id="data">Passing data</h2>
+<pre><code>return view('page', ['title' =&gt; 'About', 'team' =&gt; $team]);
+return view('page')-&gt;with('title', 'About')-&gt;with('team', $team);
+return view('page')-&gt;with(['title' =&gt; 'About', 'team' =&gt; $team]);</code></pre>
+<h2 id="share">Sharing data across all views</h2>
+<pre><code>use Illuminate\Support\Facades\View;
+View::share('siteName', get_bloginfo('name'));
+View::share(['siteName' =&gt; get_bloginfo('name'), 'siteUrl' =&gt; home_url()]);</code></pre>
+<h2 id="composers">View composers</h2>
+<pre><code>// Closure
+View::composer('pages.home', function($view) {
+    $view-&gt;with('recent', get_posts(['numberposts' =&gt; 5]));
+});
 
- <div class="next-prev">
- <a href="hooks.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Hooks</span>
- </a>
- <a href="blade.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Blade</span>
- </a>
- </div>
- </main>
- </div>
+// Multiple views
+View::composer(['pages.home', 'partials.sidebar'], function($view) {
+    $view-&gt;with('categories', get_categories());
+});
 
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+// Class method
+View::composer('pages.home', 'App\View\Composers\HomeComposer@compose');</code></pre>
+<pre><code>namespace App\View\Composers;
+use Illuminate\View\View;
+
+class HomeComposer {
+    public function compose(View $view): void {
+        $view-&gt;with('featured', get_posts(['meta_key' =&gt; 'featured', 'meta_value' =&gt; '1']));
+    }
+}</code></pre>
+
+<div class="next-prev">
+<a href="hooks.html"><span class="label">&larr; Previous</span><span class="title">Hooks</span></a>
+<a href="blade.html" class="next"><span class="label">Next &rarr;</span><span class="title">Blade</span></a>
+</div></main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
