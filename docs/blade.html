@@ -20,20 +20,200 @@
       </nav>
     </div>
   </header>
-
   <div class="docs-layout">
     <div id="sidebar-placeholder"></div>
-
     <main class="docs-content">
       <h1>Blade templates</h1>
-      <p>Laravel Blade templating engine in WordPress.</p>
 
-      <div class="note">
-        <strong>Work in progress.</strong> This section is being expanded.
-        The original Themosis 3.1 reference at
-        <a href="https://framework.themosis.com/docs/3.1/blade" target="_blank" rel="noopener">framework.themosis.com/docs/3.1/blade</a>
-        remains a valid reference in the meantime.
-      </div>
+      <ul class="toc-list">
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#basic">Basic usage</a></li>
+        <li><a href="#layouts">Layouts &amp; sections</a></li>
+        <li><a href="#directives">Control structures</a></li>
+        <li><a href="#components">Components &amp; slots</a></li>
+        <li><a href="#echo">Echoing data</a></li>
+        <li><a href="#wp-directives">WordPress directives</a></li>
+        <li><a href="#loop">Loop helper</a></li>
+        <li><a href="#extending">Extending Blade</a></li>
+      </ul>
+
+      <h2 id="introduction">Introduction</h2>
+      <p>
+        MEAT Framework uses
+        <a href="https://laravel.com/docs/blade" target="_blank" rel="noopener">Laravel Blade</a>
+        (from <a href="https://github.com/illuminate/view" target="_blank" rel="noopener">illuminate/view</a>)
+        as its primary template engine. Blade files use the <code>.blade.php</code> extension and
+        are compiled to plain PHP and cached — there is no runtime overhead.
+      </p>
+
+      <h2 id="basic">Basic usage</h2>
+      <p>Store views in your theme&#39;s <code>views/</code> folder. Return them from routes or controllers:</p>
+      <pre><code>// In a route
+Route::any('front', function ($post, $query) {
+    return view('home', ['posts' => $query->get_posts()]);
+});
+
+// In a controller
+public function index()
+{
+    return view('pages.about');
+}</code></pre>
+
+      <h2 id="layouts">Layouts &amp; sections</h2>
+      <pre><code>&lt;!-- views/layouts/main.blade.php --&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    @wp_head
+&lt;/head&gt;
+&lt;body&gt;
+    @include('partials.header')
+
+    &lt;main&gt;@yield('content')&lt;/main&gt;
+
+    &lt;aside&gt;
+        @section('sidebar')
+            &lt;p&gt;Default sidebar&lt;/p&gt;
+        @show
+    &lt;/aside&gt;
+
+    @include('partials.footer')
+    @wp_footer
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+      <pre><code>&lt;!-- views/pages/home.blade.php --&gt;
+@extends('layouts.main')
+
+@section('content')
+    &lt;h1&gt;Welcome, {{ $name }}&lt;/h1&gt;
+    @foreach($posts as $post)
+        &lt;article&gt;
+            &lt;h2&gt;{{ $post->post_title }}&lt;/h2&gt;
+        &lt;/article&gt;
+    @endforeach
+@endsection
+
+@section('sidebar')
+    @parent &lt;!-- keeps parent content --&gt;
+    &lt;p&gt;Extra sidebar content&lt;/p&gt;
+@endsection</code></pre>
+
+      <h2 id="directives">Control structures</h2>
+      <pre><code>&lt;!-- If / elseif / else --&gt;
+@if(is_user_logged_in())
+    &lt;p&gt;Welcome back!&lt;/p&gt;
+@elseif($pending)
+    &lt;p&gt;Your account is pending.&lt;/p&gt;
+@else
+    &lt;p&gt;Please log in.&lt;/p&gt;
+@endif
+
+&lt;!-- Unless (negated if) --&gt;
+@unless(is_user_logged_in())
+    &lt;a href="/login"&gt;Login&lt;/a&gt;
+@endunless
+
+&lt;!-- Foreach --&gt;
+@foreach($posts as $post)
+    &lt;li&gt;{{ $post->post_title }}&lt;/li&gt;
+    &lt;!-- $loop->first, $loop->last, $loop->index available --&gt;
+@endforeach
+
+&lt;!-- For --&gt;
+@for($i = 0; $i &lt; 5; $i++)
+    &lt;span&gt;{{ $i }}&lt;/span&gt;
+@endfor
+
+&lt;!-- Include --&gt;
+@include('partials.card', ['title' =&gt; 'My post'])</code></pre>
+
+      <h2 id="components">Components &amp; slots</h2>
+      <pre><code>&lt;!-- views/components/alert.blade.php --&gt;
+&lt;div class="alert alert-{{ $type ?? 'info' }}"&gt;
+    {{ $slot }}
+&lt;/div&gt;</code></pre>
+      <pre><code>@component('components.alert', ['type' =&gt; 'danger'])
+    &lt;strong&gt;Error!&lt;/strong&gt; Something went wrong.
+@endcomponent</code></pre>
+
+      <h2 id="echo">Echoing data</h2>
+      <pre><code>&lt;!-- Escaped (safe) --&gt;
+{{ $name }}
+
+&lt;!-- Unescaped (use for trusted HTML, e.g. post content) --&gt;
+{!! $content !!}
+{!! get_the_content() !!}
+
+&lt;!-- Null coalescing --&gt;
+{{ $title ?? 'Untitled' }}
+
+&lt;!-- Comments (not rendered in HTML) --&gt;
+{{-- This won't appear in source --}}
+
+&lt;!-- Raw curly braces (for JS frameworks like Vue/Alpine) --&gt;
+@{{ reactiveVar }}</code></pre>
+
+      <h2 id="wp-directives">WordPress-specific directives</h2>
+      <pre><code>&lt;!-- WordPress loop --&gt;
+@loop
+    &lt;article&gt;
+        &lt;h2&gt;{{ Loop::title() }}&lt;/h2&gt;
+        {!! Loop::content() !!}
+        &lt;a href="{{ Loop::link() }}"&gt;Read more&lt;/a&gt;
+    &lt;/article&gt;
+@endloop
+
+&lt;!-- Custom query --&gt;
+@query(['post_type' =&gt; 'product', 'posts_per_page' =&gt; 6])
+    &lt;div class="product"&gt;
+        &lt;h3&gt;{{ Loop::title() }}&lt;/h3&gt;
+        {{ Loop::thumbnail('medium') }}
+    &lt;/div&gt;
+@endquery
+
+&lt;!-- Head &amp; footer hooks --&gt;
+@wp_head    &lt;!-- outputs wp_head() --&gt;
+@wp_footer  &lt;!-- outputs wp_footer() --&gt;
+
+&lt;!-- Dynamic template part --&gt;
+@template('parts.content', get_post_type())
+&lt;!-- Tries: parts.content-product, parts.content-page, …, then parts.content --&gt;</code></pre>
+
+      <h2 id="loop">Loop helper methods</h2>
+      <p>The <code>Loop</code> class wraps WordPress loop functions for use inside <code>@loop</code> / <code>@query</code>:</p>
+      <pre><code>Loop::id()                        // post ID
+Loop::title()                     // post title
+Loop::content()                   // post content (HTML)
+Loop::excerpt()                   // post excerpt
+Loop::link()                      // permalink
+Loop::thumbnail('medium')         // &lt;img&gt; tag
+Loop::thumbnailUrl('medium')      // image URL
+Loop::author()                    // author display name
+Loop::authorMeta('email')         // author meta field
+Loop::date('d/m/Y')               // formatted date
+Loop::category()                  // array of category terms
+Loop::tags()                      // array of tag terms
+Loop::terms('my-taxonomy')        // array of custom taxonomy terms
+Loop::postClass()                  // class="post-4 post type-post…"
+Loop::nextPage()                  // next page link
+Loop::previousPage()              // previous page link
+Loop::paginate()                  // pagination links</code></pre>
+
+      <h2 id="extending">Extending Blade</h2>
+      <p>Register custom directives from a service provider&#39;s <code>boot()</code> method using the <code>Blade</code> facade from <a href="https://github.com/illuminate/view" target="_blank" rel="noopener">illuminate/view</a>:</p>
+      <pre><code>use Illuminate\Support\Facades\Blade;
+
+public function boot(): void
+{
+    Blade::directive('menu', function (string $expression) {
+        return "&lt;?php wp_nav_menu({$expression}); ?&gt;";
+    });
+
+    Blade::directive('asset', function (string $expression) {
+        return "&lt;?php echo get_template_directory_uri() . '/dist/' . {$expression}; ?&gt;";
+    });
+}</code></pre>
 
       <div class="next-prev">
         <a href="views.html">
@@ -45,9 +225,9 @@
           <span class="title">Twig</span>
         </a>
       </div>
+
     </main>
   </div>
-
   <script src="../assets/js/sidebar.js"></script>
 </body>
 </html>
