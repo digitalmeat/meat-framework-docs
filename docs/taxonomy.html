@@ -1,48 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Taxonomy — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Taxonomy — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Taxonomy</h1>
+<p>The <code>Taxonomy</code> facade registers custom WordPress taxonomies.</p>
+<h2 id="basic">Basic usage</h2>
+<pre><code>use Meat\Support\Facades\Taxonomy;
 
- <main class="docs-content">
- <h1>Taxonomy</h1>
- <p>Custom taxonomy registration.</p>
+Taxonomy::make('authors', 'books', 'Authors', 'Author')-&gt;set();
+// Signature: make(slug, post_type|array, plural_label, singular_label)</code></pre>
+<div class="note">The taxonomy is only registered once you call <code>set()</code>.</div>
+<h2 id="labels">Labels</h2>
+<pre><code>Taxonomy::make('authors', 'books', 'Authors', 'Author')
+    -&gt;setLabels([
+        'edit_item' =&gt; __('Edit Author', 'textdomain'),
+        'not_found' =&gt; __('No authors found', 'textdomain'),
+    ])
+    -&gt;set();</code></pre>
+<p>Full label list: <a href="https://developer.wordpress.org/reference/functions/get_taxonomy_labels/" target="_blank" rel="noopener">get_taxonomy_labels()</a></p>
+<h2 id="arguments">Customize arguments</h2>
+<pre><code>Taxonomy::make('authors', 'books', 'Authors', 'Author')
+    -&gt;setArguments([
+        'public'             =&gt; true,
+        'hierarchical'       =&gt; false,
+        'show_in_rest'       =&gt; true,
+        'show_admin_column'  =&gt; true,
+        'show_in_nav_menus'  =&gt; false,
+    ])
+    -&gt;set();</code></pre>
+<p>Full parameters: <a href="https://developer.wordpress.org/reference/functions/register_taxonomy/" target="_blank" rel="noopener">register_taxonomy()</a></p>
+<h2 id="shared">Shared taxonomies</h2>
+<pre><code>// Attach to multiple post types
+Taxonomy::make('authors', ['post', 'books'], 'Authors', 'Author')-&gt;set();</code></pre>
+<h2 id="term-fields">Term custom fields</h2>
+<pre><code>use Meat\Support\Facades\{Taxonomy, TaxonomyField, Field};
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
+$author = Taxonomy::make('author', 'post', 'Authors', 'Author')-&gt;set();
 
- <div class="next-prev">
- <a href="posttype.html">
- <span class="label">&larr; Previous</span>
- <span class="title">PostType</span>
- </a>
- <a href="user.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">User</span>
- </a>
- </div>
- </main>
- </div>
+TaxonomyField::make($author)
+    -&gt;add(Field::text('website', ['rules' =&gt; 'url']))
+    -&gt;add(Field::textarea('bio'))
+    -&gt;add(Field::choice('genre', [
+        'choices' =&gt; ['Fiction', 'Non-Fiction', 'Science', 'History'],
+    ]))
+    -&gt;set();</code></pre>
 
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+<div class="next-prev">
+<a href="posttype.html"><span class="label">&larr; Previous</span><span class="title">PostType</span></a>
+<a href="user.html" class="next"><span class="label">Next &rarr;</span><span class="title">User</span></a>
+</div></main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
