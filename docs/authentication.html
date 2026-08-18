@@ -1,48 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Authentication — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Authentication — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Authentication</h1>
+<p>MEAT Framework uses WordPress authentication as its foundation, augmented with route-level guards via <a href="https://github.com/illuminate/routing" target="_blank" rel="noopener">illuminate/routing</a> middleware.</p>
+<h2 id="wordpress">WordPress functions</h2>
+<pre><code>if (is_user_logged_in()) {
+    $user = wp_get_current_user();
+}
 
- <main class="docs-content">
- <h1>Authentication</h1>
- <p>User authentication and guards.</p>
+current_user_can('edit_posts');
+current_user_can('manage_options');
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
+$loginUrl  = wp_login_url(home_url('/dashboard'));
+$logoutUrl = wp_logout_url(home_url('/'));</code></pre>
+<h2 id="middleware">Route middleware</h2>
+<pre><code>// Require logged-in user
+Route::get('dashboard', [DashboardController::class, 'index'])-&gt;middleware('wp.can');
 
- <div class="next-prev">
- <a href="wp-cli.html">
- <span class="label">&larr; Previous</span>
- <span class="title">WP-CLI</span>
- </a>
- <a href="console.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Console</span>
- </a>
- </div>
- </main>
- </div>
+// Require specific capability
+Route::get('admin/settings', fn() =&gt; view('settings'))-&gt;middleware('wp.cap:manage_options');
 
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+// Group
+Route::middleware(['wp.can'])-&gt;group(function() {
+    Route::get('profile', [ProfileController::class, 'show']);
+    Route::post('profile', [ProfileController::class, 'update']);
+});</code></pre>
+<h2 id="user-facade">User facade</h2>
+<pre><code>use Meat\Support\Facades\User;
+
+$user  = User::current();
+$id    = User::current()-&gt;ID;
+$email = User::current()-&gt;user_email;
+$roles = User::current()-&gt;roles;         // array
+User::current()-&gt;has_cap('edit_posts');
+User::current()-&gt;has_cap('manage_options');</code></pre>
+<h2 id="api">API authentication</h2>
+<p>The <code>api</code> middleware group requires <code>edit_posts</code> capability by default. Customize in <code>app/Http/Kernel.php</code>:</p>
+<pre><code>protected $middlewareGroups = [
+    'api' =&gt; [
+        'throttle:60,1',
+        'wp.can:edit_posts',
+        'bindings',
+    ],
+];</code></pre>
+
+<div class="next-prev"><a href="wp-cli.html"><span class="label">&larr; Previous</span><span class="title">WP-CLI</span></a><a href="console.html" class="next"><span class="label">Next &rarr;</span><span class="title">Console</span></a></div>
+</main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
