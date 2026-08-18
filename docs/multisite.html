@@ -1,48 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Multisite — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Multisite — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Multisite</h1>
+<p>MEAT Framework works with WordPress Multisite (network installations). Some configuration differences apply.</p>
+<h2 id="setup">Setup requirements</h2>
+<p>Configure multisite in <code>config/wordpress.php</code>:</p>
+<pre><code>define('WP_ALLOW_MULTISITE', true);
+define('MULTISITE', true);
+define('SUBDOMAIN_INSTALL', false); // true for subdomain, false for subdirectory
+define('DOMAIN_CURRENT_SITE', env('MULTISITE_DOMAIN', 'my-project.test'));
+define('PATH_CURRENT_SITE', '/');
+define('SITE_ID_CURRENT_SITE', 1);
+define('BLOG_ID_CURRENT_SITE', 1);</code></pre>
+<pre><code># .env
+APP_URL=http://my-project.test
+WP_URL=http://my-project.test/cms
+MULTISITE_DOMAIN=my-project.test</code></pre>
+<h2 id="network">Network activation</h2>
+<p>Plugins that use MEAT Framework hooks should be network-activated for multisite compatibility. Network-activated plugins run before site plugins.</p>
+<h2 id="routing">Routing in multisite</h2>
+<p>Routes in <code>routes/web.php</code> apply network-wide. Use conditional tags to differentiate between sites:</p>
+<pre><code>Route::any('home', function($post, $query) {
+    $blogId = get_current_blog_id();
 
- <main class="docs-content">
- <h1>Multisite</h1>
- <p>WordPress multisite configuration.</p>
+    if ($blogId === 2) {
+        return view('sites.site2.home');
+    }
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
+    return view('home');
+});</code></pre>
+<h2 id="db">Per-site database</h2>
+<p>WordPress multisite uses separate table prefixes per site (e.g. <code>wp_2_posts</code>, <code>wp_3_posts</code>). When using Eloquent to query WordPress tables, switch blog context first:</p>
+<pre><code>switch_to_blog(2);
+$posts = Post::where('post_status', 'publish')-&gt;get();
+restore_current_blog();</code></pre>
+<div class="note"><strong>Note:</strong> MEAT Framework's current multisite support is tested on subdirectory installs. Subdomain installs require additional server (nginx/Apache) wildcard configuration.</div>
 
- <div class="next-prev">
- <a href="plugin.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Plugin handbook</span>
- </a>
- <a href="woocommerce.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">WooCommerce</span>
- </a>
- </div>
- </main>
- </div>
-
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+<div class="next-prev"><a href="plugin.html"><span class="label">&larr; Previous</span><span class="title">Plugin handbook</span></a><a href="woocommerce.html" class="next"><span class="label">Next &rarr;</span><span class="title">WooCommerce</span></a></div>
+</main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
