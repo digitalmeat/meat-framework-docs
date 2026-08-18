@@ -1,48 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Asset — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Asset — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Asset</h1>
+<p>The <code>Asset</code> facade enqueues CSS and JS files. Call <code>add()</code> then <code>to()</code>.</p>
+<h2 id="add">Adding assets</h2>
+<pre><code>// CSS — front-end
+Asset::add('styles', 'css/screen.css', [], '1.0', 'all')-&gt;to();
+// JS in footer — front-end
+Asset::add('scripts', 'js/app.js', ['jquery'], '1.0', true)-&gt;to();
+// WordPress admin
+Asset::add('admin-js', 'js/admin.js', ['backbone'], '1.0', true)-&gt;to('admin');
+// Login page
+Asset::add('login-css', 'css/login.css', [], '1.0', 'all')-&gt;to('login');
+// Multiple locations
+Asset::add('shared', 'js/utils.js', [], '1.0', true)-&gt;to(['front','admin']);</code></pre>
+<h2 id="external">External assets</h2>
+<pre><code>// Extension auto-detected
+Asset::add('cdn-jquery', '//cdn.jsdelivr.net/npm/jquery@3/jquery.min.js', [], '3', true)-&gt;to();
+// No file extension — specify type
+Asset::add('gmap', 'https://maps.googleapis.com/maps/api/js?key=KEY', [], '3', true)
+    -&gt;setType('script')-&gt;to();</code></pre>
+<h2 id="localize">Localize data</h2>
+<p>Uses <a href="https://developer.wordpress.org/reference/functions/wp_localize_script/" target="_blank" rel="noopener">wp_localize_script()</a>:</p>
+<pre><code>$asset = Asset::add('app', 'js/app.js', [], '1.0', true)-&gt;to();
+$asset-&gt;localize('meatApp', [
+    'ajaxurl' =&gt; admin_url('admin-ajax.php'),
+    'nonce'   =&gt; wp_create_nonce('my-action'),
+]);</code></pre>
+<h2 id="inline">Inline code</h2>
+<pre><code>$css = Asset::add('theme', 'css/theme.css', [], '1.0', 'all')-&gt;to();
+$css-&gt;inline('.hero { background: #e84a4a; }');
 
- <main class="docs-content">
- <h1>Asset</h1>
- <p>Enqueuing scripts and styles.</p>
+$js = Asset::add('app', 'js/app.js', [], '1.0', true)-&gt;to();
+$js-&gt;inline('var App = App || {};', 'before'); // before the script tag</code></pre>
+<h2 id="attributes">Custom HTML attributes</h2>
+<pre><code>Asset::add('gmap', 'https://maps.googleapis.com/maps/api/js', [], '3', false)
+    -&gt;setType('script')
+    -&gt;attributes(['defer', 'data-env' =&gt; 'prod'])
+    -&gt;to();</code></pre>
+<h2 id="config">Config &amp; load order</h2>
+<p>Register asset paths in <code>config/assets.php</code>. Search order: root config → plugins → theme. First match wins. Use unique handles and subdirectory names to avoid conflicts.</p>
+<pre><code>'paths' =&gt; [
+    web_path('dist') =&gt; rtrim(config('app.url'), '/') . '/dist',
+],</code></pre>
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
-
- <div class="next-prev">
- <a href="ajax.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Ajax</span>
- </a>
- <a href="dropins.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Drop-ins</span>
- </a>
- </div>
- </main>
- </div>
-
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+<div class="next-prev">
+<a href="ajax.html"><span class="label">&larr; Previous</span><span class="title">Ajax</span></a>
+<a href="dropins.html" class="next"><span class="label">Next &rarr;</span><span class="title">Drop-ins</span></a>
+</div></main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
