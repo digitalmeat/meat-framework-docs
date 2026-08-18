@@ -1,48 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Theme handbook — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Theme handbook — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Theme handbook</h1>
+<p>A MEAT Framework theme is a standard WordPress theme that leverages the framework's routing, views, and asset pipeline.</p>
+<h2 id="create">Install a theme</h2>
+<pre><code>php artisan theme:install my-theme</code></pre>
+<p>This downloads the theme boilerplate into <code>htdocs/content/themes/my-theme/</code> and sets it as the active theme.</p>
+<h2 id="structure">Theme structure</h2>
+<pre><code>my-theme/
+├── config/
+│   ├── assets.php     # asset paths (&amp; dist URL)
+│   ├── menus.php      # nav menu registration
+│   ├── supports.php   # theme support declarations
+│   ├── templates.php  # page template slugs
+│   └── theme.php      # views directories
+├── dist/              # compiled assets output (never edit)
+├── resources/
+│   ├── js/            # JavaScript source
+│   └── scss/          # SCSS source
+├── views/             # Blade/Twig templates
+│   ├── layouts/
+│   ├── pages/
+│   └── partials/
+├── functions.php      # theme bootstrap
+└── style.css          # WP theme header</code></pre>
+<h2 id="functions">functions.php</h2>
+<p>The theme's <code>functions.php</code> registers assets, menus, and theme supports:</p>
+<pre><code>use Meat\Support\Facades\Asset;
 
- <main class="docs-content">
- <h1>Theme handbook</h1>
- <p>Building a MEAT Framework theme.</p>
+// Enqueue compiled assets
+Asset::add('theme-css', 'css/theme.css', [], '1.0', 'all')-&gt;to('front');
+Asset::add('theme-js',  'js/app.js', ['jquery'], '1.0', true)-&gt;to('front');
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
+// Register navigation menus
+register_nav_menus([
+    'primary' =&gt; 'Primary Navigation',
+    'footer'  =&gt; 'Footer Navigation',
+]);
 
- <div class="next-prev">
- <a href="widgets.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Widgets</span>
- </a>
- <a href="plugin.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Plugin handbook</span>
- </a>
- </div>
- </main>
- </div>
+// Theme support
+add_theme_support('title-tag');
+add_theme_support('post-thumbnails');
+add_theme_support('html5', ['search-form', 'comment-form', 'gallery']);</code></pre>
+<h2 id="routes">Theme routes</h2>
+<p>Routes can be defined in the root <code>routes/web.php</code> (recommended) or in the theme's <code>routes.php</code> file. Theme routes override root and plugin routes.</p>
+<h2 id="templates">Page templates</h2>
+<p>Register page templates in <code>config/templates.php</code>:</p>
+<pre><code>return [
+    'template-full-width' =&gt; 'Full Width',
+    'template-landing'    =&gt; 'Landing Page',
+    'template-sidebar'    =&gt; 'With Sidebar',
+];</code></pre>
+<p>Use in routes:</p>
+<pre><code>Route::any('template', ['template-full-width', function($post, $query) {
+    return view('templates.full-width', compact('post'));
+}]);</code></pre>
+<h2 id="build">Asset build</h2>
+<pre><code>pnpm install   # install dependencies
+pnpm build     # production build to dist/
+pnpm watch     # watch mode for development</code></pre>
 
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+<div class="next-prev"><a href="widgets.html"><span class="label">&larr; Previous</span><span class="title">Widgets</span></a><a href="plugin.html" class="next"><span class="label">Next &rarr;</span><span class="title">Plugin handbook</span></a></div>
+</main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
