@@ -1,48 +1,77 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Console — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Console — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Console (Artisan)</h1>
+<p>MEAT Framework uses Laravel Artisan. Run <code>php artisan</code> from project root to list all commands.</p>
+<h2 id="built-in">Built-in commands</h2>
+<pre><code># Setup
+php artisan key:generate
+php artisan salts:generate
 
- <main class="docs-content">
- <h1>Console</h1>
- <p>Custom Artisan commands.</p>
+# Scaffolding
+php artisan make:controller PageController
+php artisan make:model Book --migration
+php artisan make:middleware CheckCapability
+php artisan make:hook MyHook
+php artisan make:command SendWeeklyDigest
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
+# Database
+php artisan migrate
+php artisan migrate:rollback
+php artisan migrate:status
 
- <div class="next-prev">
- <a href="authentication.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Authentication</span>
- </a>
- <a href="database.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Database</span>
- </a>
- </div>
- </main>
- </div>
+# Cache
+php artisan cache:clear
+php artisan route:clear
+php artisan view:clear
 
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+# WordPress
+php artisan theme:install my-theme
+
+# Dev
+php artisan route:list
+php artisan tinker</code></pre>
+<h2 id="custom">Custom commands</h2>
+<pre><code>php artisan make:command SendWeeklyDigest</code></pre>
+<pre><code>namespace App\Console\Commands;
+use Illuminate\Console\Command;
+
+class SendWeeklyDigest extends Command
+{
+    protected $signature   = 'digest:weekly {--dry-run}';
+    protected $description = 'Send weekly digest to subscribers';
+
+    public function handle(): int
+    {
+        if ($this-&gt;option('dry-run')) {
+            $this-&gt;info('Dry run — no emails sent.');
+            return Command::SUCCESS;
+        }
+        $users = get_users(['role' =&gt; 'subscriber']);
+        $this-&gt;withProgressBar($users, fn($u) =&gt; wp_mail($u-&gt;user_email, 'Digest', 'Hi!'));
+        $this-&gt;newLine();
+        return Command::SUCCESS;
+    }
+}</code></pre>
+<h2 id="schedule">Scheduled commands</h2>
+<pre><code>// app/Console/Kernel.php
+protected function schedule(Schedule $schedule): void
+{
+    $schedule-&gt;command('digest:weekly')-&gt;weekly()-&gt;mondays()-&gt;at('08:00');
+    $schedule-&gt;command('cache:clear')-&gt;daily();
+}</code></pre>
+<p>See <a href="https://laravel.com/docs/artisan" target="_blank" rel="noopener">Laravel Artisan docs</a> for the full API.</p>
+
+<div class="next-prev"><a href="authentication.html"><span class="label">&larr; Previous</span><span class="title">Authentication</span></a><a href="database.html" class="next"><span class="label">Next &rarr;</span><span class="title">Database</span></a></div>
+</main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
