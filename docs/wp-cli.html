@@ -1,48 +1,100 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>WP-CLI — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>WP-CLI — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>WP-CLI</h1>
+<p>MEAT Framework is fully compatible with <a href="https://wp-cli.org/" target="_blank" rel="noopener">WP-CLI</a>. Standard WP-CLI commands work out-of-the-box. You can also register custom WP-CLI commands within the framework.</p>
+<h2 id="setup">Setup</h2>
+<p>WP-CLI must be configured to find the WordPress install in the <code>htdocs/cms/</code> subdirectory. Create a <code>wp-cli.yml</code> at project root:</p>
+<pre><code># wp-cli.yml
+path: htdocs/cms
+url: http://local.test</code></pre>
+<h2 id="commands">Common WP-CLI commands</h2>
+<pre><code># Core
+wp core version
+wp core update
 
- <main class="docs-content">
- <h1>WP-CLI</h1>
- <p>Command-line WordPress management.</p>
+# Users
+wp user list
+wp user create john john@example.com --role=editor
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
+# Posts
+wp post list --post_type=post --post_status=publish
+wp post create --post_title="Hello" --post_status=publish
 
- <div class="next-prev">
- <a href="woocommerce.html">
- <span class="label">&larr; Previous</span>
- <span class="title">WooCommerce</span>
- </a>
- <a href="authentication.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Authentication</span>
- </a>
- </div>
- </main>
- </div>
+# Plugins
+wp plugin list
+wp plugin activate my-plugin
 
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+# Database
+wp db export backup.sql
+wp db import backup.sql
+wp search-replace 'http://old.dev' 'http://new.test'
+
+# Cache
+wp cache flush
+wp rewrite flush</code></pre>
+<h2 id="custom">Custom WP-CLI commands</h2>
+<p>Register custom commands from a <a href="hooks.html">Hookable</a> class:</p>
+<pre><code>namespace App\Hooks;
+
+use Meat\Hook\Hookable;
+
+class WpCliCommands extends Hookable
+{
+    public string $hook = 'cli_init';
+
+    public function register(): void
+    {
+        WP_CLI::add_command('meat sync', MeatSyncCommand::class);
+    }
+}
+
+class MeatSyncCommand
+{
+    /**
+     * Sync products from the external API.
+     *
+     * ## OPTIONS
+     * [--dry-run]
+     * : Preview changes without writing to DB.
+     *
+     * ## EXAMPLES
+     *     wp meat sync
+     *     wp meat sync --dry-run
+     */
+    public function __invoke(array $args, array $assoc_args): void
+    {
+        $dryRun = isset($assoc_args['dry-run']);
+        WP_CLI::log('Starting sync...');
+
+        // Your sync logic here
+        $count = $dryRun ? 0 : $this-&gt;doSync();
+
+        WP_CLI::success("Synced {$count} products.");
+    }
+
+    private function doSync(): int
+    {
+        // implementation
+        return 0;
+    }
+}</code></pre>
+<h2 id="artisan-vs-wpcli">Artisan vs WP-CLI</h2>
+<ul>
+  <li>Use <strong>Artisan</strong> (<code>php artisan</code>) for framework tasks: scaffolding, migrations, cache, routes</li>
+  <li>Use <strong>WP-CLI</strong> (<code>wp</code>) for WordPress tasks: users, posts, plugins, database, search-replace</li>
+</ul>
+
+<div class="next-prev"><a href="woocommerce.html"><span class="label">&larr; Previous</span><span class="title">WooCommerce</span></a><a href="authentication.html" class="next"><span class="label">Next &rarr;</span><span class="title">Authentication</span></a></div>
+</main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
