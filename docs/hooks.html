@@ -20,19 +20,147 @@
       </nav>
     </div>
   </header>
-
   <div class="docs-layout">
     <div id="sidebar-placeholder"></div>
-
     <main class="docs-content">
       <h1>Hooks</h1>
-      <p>WordPress action and filter hooks via service providers.</p>
+
+      <ul class="toc-list">
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#defaults">Default hooks</a></li>
+        <li><a href="#create">Creating a hook class</a></li>
+        <li><a href="#register">Registering hooks</a></li>
+        <li><a href="#action">Action hook</a></li>
+        <li><a href="#filter">Filter hook</a></li>
+        <li><a href="#priority">Priority</a></li>
+      </ul>
+
+      <h2 id="introduction">Introduction</h2>
+      <p>
+        MEAT Framework lets you extend WordPress from the application root using <strong>Hookable classes</strong>
+        — PHP classes that run your code in the context of the WordPress lifecycle, before mu-plugins load.
+        This replaces the need for mu-plugin files to bootstrap application features.
+      </p>
+      <p>
+        When you are inside a theme or plugin (where all WordPress APIs are already loaded),
+        use the <a href="action.html">Action</a> or <a href="filter.html">Filter</a> facades directly instead.
+        Hookable classes are the application-level entry point only.
+      </p>
+
+      <h2 id="defaults">Default hook classes</h2>
+      <p>
+        The framework ships with built-in hookable classes in <code>app/Hooks/</code>.
+        The <code>Application</code> class is the primary one — it loads core framework assets and features.
+        Review each file; they are self-documented.
+      </p>
+
+      <h2 id="create">Creating a hook class</h2>
+      <pre><code>php artisan make:hook MyHook</code></pre>
+      <p>This generates <code>app/Hooks/MyHook.php</code>:</p>
+      <pre><code>&lt;?php
+
+namespace App\Hooks;
+
+use Meat\Hook\Hookable;
+
+class MyHook extends Hookable
+{
+    /**
+     * Extend WordPress.
+     */
+    public function register(): void
+    {
+        // Your code runs here — all WordPress APIs available
+        add_image_size('hero', 1440, 600, true);
+    }
+}</code></pre>
+
+      <h2 id="register">Registering hook classes</h2>
+      <p>Hookable classes are <strong>not auto-discovered</strong>. Add them to <code>config/app.php</code>:</p>
+      <pre><code>// config/app.php
+'hooks' => [
+    App\Hooks\Application::class,
+    App\Hooks\MyHook::class,
+],</code></pre>
+
+      <h2 id="action">Running on a specific WordPress action</h2>
+      <p>
+        By default, a hookable class runs immediately (before mu-plugins).
+        Use the <code>$hook</code> property to defer execution to any WordPress action:
+      </p>
+      <pre><code>&lt;?php
+
+namespace App\Hooks;
+
+use Meat\Hook\Hookable;
+
+class RegisterMenus extends Hookable
+{
+    public string $hook = 'after_setup_theme';
+
+    public function register(): void
+    {
+        register_nav_menus([
+            'primary' => 'Primary navigation',
+            'footer'  => 'Footer navigation',
+        ]);
+    }
+}</code></pre>
+
+      <h2 id="filter">Filter hooks</h2>
+      <p>
+        Hookable classes can also act as filters. The <code>register()</code> method receives the
+        filter parameters and must return a value:
+      </p>
+      <pre><code>&lt;?php
+
+namespace App\Hooks;
+
+use Meat\Hook\Hookable;
+
+class CustomExcerptLength extends Hookable
+{
+    public string $hook = 'excerpt_length';
+
+    public function register(int $length): int
+    {
+        return 20;
+    }
+}</code></pre>
+
+      <pre><code>&lt;?php
+
+namespace App\Hooks;
+
+use Meat\Hook\Hookable;
+
+class CleanTitleFilter extends Hookable
+{
+    public string $hook = 'the_title';
+
+    public function register(string $title): string
+    {
+        return ucwords(strtolower($title));
+    }
+}</code></pre>
+
+      <h2 id="priority">Priority</h2>
+      <p>Control the execution order with the <code>$priority</code> property (default: <code>10</code>):</p>
+      <pre><code>class LateHook extends Hookable
+{
+    public string $hook = 'init';
+    public int $priority = 99;
+
+    public function register(): void
+    {
+        // Runs late in the "init" action
+    }
+}</code></pre>
 
       <div class="note">
-        <strong>Work in progress.</strong> This section is being expanded.
-        The original Themosis 3.1 reference at
-        <a href="https://framework.themosis.com/docs/3.1/hooks" target="_blank" rel="noopener">framework.themosis.com/docs/3.1/hooks</a>
-        remains a valid reference in the meantime.
+        <strong>Tip:</strong> For one-off actions and filters inside controllers, views, or services,
+        use the <a href="action.html">Action</a> and <a href="filter.html">Filter</a> facades —
+        they are simpler and don't require a class.
       </div>
 
       <div class="next-prev">
@@ -45,9 +173,9 @@
           <span class="title">Views</span>
         </a>
       </div>
+
     </main>
   </div>
-
   <script src="../assets/js/sidebar.js"></script>
 </body>
 </html>
