@@ -1,48 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Middleware — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Middleware — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Middleware</h1>
+<p>Middleware filter HTTP requests before reaching routes, using <a href="https://github.com/illuminate/routing" target="_blank" rel="noopener">illuminate/routing</a>. Dependencies are injected via <a href="https://github.com/illuminate/container" target="_blank" rel="noopener">illuminate/container</a>.</p>
+<h2 id="create">Create</h2>
+<pre><code>php artisan make:middleware CheckCapability</code></pre>
+<pre><code>namespace App\Http\Middleware;
+use Closure; use Illuminate\Http\Request;
 
- <main class="docs-content">
- <h1>Middleware</h1>
- <p>HTTP request/response pipeline filters.</p>
+class CheckCapability {
+    public function handle(Request $request, Closure $next, string $cap = 'read'): mixed {
+        if (!current_user_can($cap)) return redirect('/');
+        return $next($request);
+    }
+}</code></pre>
+<h2 id="register">Register &amp; assign</h2>
+<p>Register in <code>$routeMiddleware</code> in <code>app/Http/Kernel.php</code>:</p>
+<pre><code>protected $routeMiddleware = [
+    'wp.bindings' =&gt; \Meat\Route\Middleware\WordPressBindings::class,
+    'wp.can'      =&gt; \Meat\Route\Middleware\WordPressAuthorize::class,
+    'wp.cap'      =&gt; \App\Http\Middleware\CheckCapability::class,
+    'bindings'    =&gt; \Illuminate\Routing\Middleware\SubstituteBindings::class,
+];</code></pre>
+<pre><code>Route::get('dashboard', [DashboardController::class, 'index'])-&gt;middleware('wp.can');
+Route::get('/', fn() =&gt; view('home'))-&gt;middleware(['wp.can', 'log']);</code></pre>
+<h2 id="groups">Middleware groups</h2>
+<p>MEAT Framework ships with <code>web</code>, <code>api</code>, and <code>admin</code> groups. <code>web</code> is auto-applied to <code>routes/web.php</code>.</p>
+<pre><code>Route::prefix('api')-&gt;middleware('api')-&gt;group(function() {
+    Route::get('posts', [PostApiController::class, 'index']);
+});</code></pre>
+<h2 id="parameters">Parameters</h2>
+<pre><code>Route::post('post/{id}', fn() =&gt; null)-&gt;middleware('wp.cap:edit_posts');
+// Received as: handle(Request $r, Closure $next, string $cap): mixed</code></pre>
+<h2 id="terminable">Terminable middleware</h2>
+<pre><code>class RequestLogger {
+    public function handle(Request $r, Closure $next): mixed { return $next($r); }
+    public function terminate(Request $r, $response): void {
+        error_log($r-&gt;method().' '.$r-&gt;path()); // runs after response is sent
+    }
+}</code></pre>
+<p>See <a href="https://laravel.com/docs/middleware" target="_blank" rel="noopener">Laravel middleware docs</a> for the full API.</p>
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
-
- <div class="next-prev">
- <a href="routing.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Routing</span>
- </a>
- <a href="controllers.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Controllers</span>
- </a>
- </div>
- </main>
- </div>
-
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+<div class="next-prev">
+<a href="routing.html"><span class="label">&larr; Previous</span><span class="title">Routing</span></a>
+<a href="controllers.html" class="next"><span class="label">Next &rarr;</span><span class="title">Controllers</span></a>
+</div></main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
