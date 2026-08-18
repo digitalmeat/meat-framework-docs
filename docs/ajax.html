@@ -1,48 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Ajax — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Ajax — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Ajax</h1>
+<p>The <code>Ajax</code> facade wraps WordPress AJAX registration.</p>
+<h2 id="basic">Basic usage</h2>
+<pre><code>Ajax::listen(string $action, callable $callback, string|bool $logged = 'both');
+// $logged: true=logged-in, false=logged-out, 'both'=all users</code></pre>
+<p>Example in a <a href="hooks.html">Hookable</a> class:</p>
+<pre><code>namespace App\Hooks;
+use Meat\Hook\Hookable; use Meat\Support\Facades\Ajax;
 
- <main class="docs-content">
- <h1>Ajax</h1>
- <p>WordPress AJAX endpoint registration.</p>
+class AjaxHandlers extends Hookable {
+    public function register(): void {
+        Ajax::listen('calculate', function() {
+            check_ajax_referer('my-nonce', 'security');
+            wp_send_json_success(intval($_POST['n'] ?? 0) * 2);
+        }, 'both');
+    }
+}</code></pre>
+<p>JavaScript:</p>
+<pre><code>jQuery.ajax({
+    url: meatApp.ajaxurl, type: 'POST',
+    data: { action: 'calculate', security: meatApp.nonce, n: 5 }
+}).done(r =&gt; console.log(r.data)); // 10</code></pre>
+<h2 id="global">Global JS objects</h2>
+<p>Front-end: <code>meatApp</code> object (at minimum <code>ajaxurl</code>). Extend via filter:</p>
+<pre><code>use Meat\Support\Facades\Filter;
+Filter::add('meat_front_global', function(array $data): array {
+    $data['nonce']  = wp_create_nonce('my-nonce');
+    $data['userId'] = get_current_user_id();
+    return $data;
+});</code></pre>
+<p>Admin: <code>meatGlobal</code> (name fixed, required by core JS):</p>
+<pre><code>Filter::add('meat_admin_global', function(array $data): array {
+    $data['postId'] = get_the_ID();
+    return $data;
+});</code></pre>
+<h2 id="localize">WordPress localize</h2>
+<p>For per-script data, prefer <a href="asset.html#localize">Asset::localize()</a> — it scopes the data to a specific script handle via <code>wp_localize_script()</code>.</p>
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
-
- <div class="next-prev">
- <a href="action.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Action</span>
- </a>
- <a href="asset.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Asset</span>
- </a>
- </div>
- </main>
- </div>
-
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+<div class="next-prev">
+<a href="action.html"><span class="label">&larr; Previous</span><span class="title">Action</span></a>
+<a href="asset.html" class="next"><span class="label">Next &rarr;</span><span class="title">Asset</span></a>
+</div></main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
