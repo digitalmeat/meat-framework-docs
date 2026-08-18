@@ -20,20 +20,155 @@
       </nav>
     </div>
   </header>
-
   <div class="docs-layout">
     <div id="sidebar-placeholder"></div>
-
     <main class="docs-content">
       <h1>Configuration</h1>
-      <p>Application configuration via .env and config/ files.</p>
+
+      <ul class="toc-list">
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#environment">Environment (.env)</a></li>
+        <li><a href="#defaults">.env defaults</a></li>
+        <li><a href="#reading-env">Reading env values</a></li>
+        <li><a href="#wordpress">WordPress config</a></li>
+        <li><a href="#salts">Salts &amp; keys</a></li>
+        <li><a href="#config-helper">config() helper</a></li>
+        <li><a href="#load-order">Load order</a></li>
+      </ul>
+
+      <h2 id="introduction">Introduction</h2>
+      <p>
+        All configuration files for MEAT Framework live in the <code>config/</code> directory at project root.
+        Each file is dedicated to a feature or package (application, cache, database, WordPress, …).
+        Sensitive values are never stored in config files — they live in a <code>.env</code> file
+        managed by the <a href="https://github.com/vlucas/phpdotenv" target="_blank" rel="noopener">vlucas/phpdotenv</a> package.
+      </p>
+
+      <h2 id="environment">Environment configuration (.env)</h2>
+      <p>
+        Environment variables are defined in a single <code>.env</code> file at project root.
+        This file keeps critical data (passwords, API keys, salts) out of the web-server public root
+        and out of version control. A <code>.env.sample</code> file is committed to the repo as the template.
+      </p>
+      <p>Copy it on first install:</p>
+      <pre><code>cp .env.sample .env</code></pre>
+
+      <h2 id="defaults">Default variables</h2>
+      <pre><code>APP_ENV=local
+APP_DEBUG=false
+APP_KEY=
+APP_TD=my-app
+
+# WordPress salts — generate with: php artisan salts:generate
+AUTH_KEY=
+SECURE_AUTH_KEY=
+LOGGED_IN_KEY=
+NONCE_KEY=
+AUTH_SALT=
+SECURE_AUTH_SALT=
+LOGGED_IN_SALT=
+NONCE_SALT=
+
+APP_URL=http://local.test
+WP_URL=http://local.test/cms
+
+DATABASE_NAME=my_db
+DATABASE_USER=root
+DATABASE_PASSWORD=root
+DATABASE_HOST=localhost
+DATABASE_PREFIX=wp_
+
+MAIL_HOST=smtp.mailtrap.io
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_FROM_ADDRESS=noreply@example.com
+MAIL_FROM_NAME=MEAT Framework</code></pre>
 
       <div class="note">
-        <strong>Work in progress.</strong> This section is being expanded.
-        The original Themosis 3.1 reference at
-        <a href="https://framework.themosis.com/docs/3.1/configuration" target="_blank" rel="noopener">framework.themosis.com/docs/3.1/configuration</a>
-        remains a valid reference in the meantime.
+        <strong>APP_URL</strong> is the base URL of your application.
+        <strong>WP_URL</strong> is the WordPress admin URL — WordPress is installed in the
+        <code>cms/</code> subdirectory by default, so keep the <code>/cms</code> fragment.
       </div>
+      <div class="callout">
+        <p>
+          If <code>APP_ENV</code> is removed, it defaults to <code>production</code>.
+          Leave <code>APP_DEBUG=false</code> until WordPress is fully installed — PHP 8.x
+          compatibility warnings from WordPress itself will otherwise flood the screen.
+        </p>
+      </div>
+
+      <h2 id="reading-env">Reading environment values</h2>
+      <p>
+        Values from <code>.env</code> are loaded by <a href="https://github.com/vlucas/phpdotenv" target="_blank" rel="noopener">vlucas/phpdotenv</a>
+        into <code>$_ENV</code> and <code>$_SERVER</code>. Use the <code>env()</code> helper anywhere in your code:
+      </p>
+      <pre><code>$debug = env('APP_DEBUG');
+
+// With a default
+$custom = env('MY_VAR', 'default');</code></pre>
+
+      <h3>Detecting the current environment</h3>
+      <pre><code>use Illuminate\Support\Facades\App;
+
+$env = App::environment();         // 'local', 'staging', 'production'…
+
+if (App::environment('local')) {
+    // local only
+}
+
+if (App::environment(['local', 'staging'])) {
+    // local or staging
+}</code></pre>
+
+      <h2 id="wordpress">WordPress configuration</h2>
+      <p>
+        Instead of editing <code>wp-config.php</code>, all WordPress constants go in
+        <code>config/wordpress.php</code>. This file has access to <code>env()</code> and all
+        <a href="https://github.com/illuminate/config" target="_blank" rel="noopener">illuminate/config</a> helpers:
+      </p>
+      <pre><code>// config/wordpress.php
+define('WP_DEBUG', env('APP_DEBUG', false));
+define('WP_DEBUG_LOG', env('APP_DEBUG', false));
+define('DISALLOW_FILE_EDIT', true);</code></pre>
+
+      <h2 id="salts">Salt and nonce keys</h2>
+      <p>Generate WordPress authentication keys and salts:</p>
+      <pre><code>php artisan salts:generate</code></pre>
+      <p>This writes values to your <code>.env</code> and maps them in <code>config/wordpress.php</code>:</p>
+      <pre><code>define('AUTH_KEY',         config('app.salts.auth_key'));
+define('SECURE_AUTH_KEY',  config('app.salts.secure_auth_key'));
+define('LOGGED_IN_KEY',    config('app.salts.logged_in_key'));
+define('NONCE_KEY',        config('app.salts.nonce_key'));
+// …</code></pre>
+
+      <h2 id="config-helper">Accessing configuration values</h2>
+      <p>
+        Configuration is managed by the
+        <a href="https://github.com/illuminate/config" target="_blank" rel="noopener">illuminate/config</a> package.
+        Use the <code>config()</code> helper or the <code>Config</code> facade:
+      </p>
+      <pre><code>// Via helper
+$name = config('app.name');
+$name = config('app.name', 'My App'); // with default
+
+// Via facade
+use Illuminate\Support\Facades\Config;
+$charset = Config::get('app.charset');</code></pre>
+
+      <p>The dot syntax maps to file + key: <code>app.name</code> → <code>config/app.php</code> → <code>name</code> key.</p>
+
+      <pre><code>// Retrieve a nested value
+$wpDir = config('app.wp.dir');
+
+// Retrieve all properties of a config file
+$all = config('theme'); // all keys from config/theme.php</code></pre>
+
+      <h2 id="load-order">Configuration load order</h2>
+      <p>
+        If multiple config files share the same name (root, plugin, theme), they do <strong>not</strong> merge.
+        Load order: <em>root config → active plugins → active theme</em>, with later loaders overriding earlier ones.
+        Use unique filenames per plugin/theme to avoid unexpected overrides.
+      </p>
 
       <div class="next-prev">
         <a href="installation.html">
@@ -45,9 +180,9 @@
           <span class="title">Application structure</span>
         </a>
       </div>
+
     </main>
   </div>
-
   <script src="../assets/js/sidebar.js"></script>
 </body>
 </html>
