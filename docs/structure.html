@@ -1,48 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Application structure — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Application structure — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Application structure</h1>
+<p>A MEAT Framework project follows a standard directory layout. The web server document root is the <code>htdocs/</code> subdirectory — never the project root.</p>
+<h2 id="root">Root directory</h2>
+<pre><code>my-project/
+├── app/                    # PHP application code
+│   ├── Hooks/              # Hookable classes (WordPress lifecycle entry points)
+│   ├── Http/
+│   │   ├── Controllers/    # Route controllers
+│   │   ├── Middleware/     # HTTP middleware
+│   │   └── Kernel.php
+│   ├── Models/             # Eloquent models
+│   ├── Providers/          # Service providers
+│   └── Services/           # Business logic / services
+├── bootstrap/              # Application bootstrapper
+├── config/                 # Configuration files
+├── database/
+│   └── migrations/         # Database migrations
+├── htdocs/                 # ← WEB SERVER DOCUMENT ROOT
+│   ├── cms/                # WordPress core installation
+│   └── content/
+│       └── themes/         # Your custom theme(s)
+├── resources/
+│   └── views/              # Global Blade/Twig views
+├── routes/
+│   └── web.php             # Application routes
+├── .env                    # Environment variables (not committed)
+├── .env.sample             # Template for .env
+└── composer.json</code></pre>
+<h2 id="config">config/ directory</h2>
+<ul>
+  <li><code>app.php</code> — application settings, hooks registration, WordPress conditions</li>
+  <li><code>database.php</code> — DB connections</li>
+  <li><code>wordpress.php</code> — WordPress constants (replaces wp-config.php)</li>
+  <li><code>assets.php</code> — asset paths configuration</li>
+  <li><code>view.php</code> — view directories</li>
+</ul>
+<h2 id="theme">Theme directory</h2>
+<pre><code>htdocs/content/themes/my-theme/
+├── config/         # Theme-specific config (assets, templates, etc.)
+├── dist/           # Compiled assets (output from your build tool)
+├── resources/
+│   └── js/         # JavaScript source
+│   └── scss/       # SCSS source
+└── views/          # Blade/Twig template files</code></pre>
+<h2 id="routes">Routes</h2>
+<p>All web routes live in <code>routes/web.php</code>. The <code>web</code> middleware group is automatically applied. See the <a href="routing.html">Routing</a> guide for the full API.</p>
 
- <main class="docs-content">
- <h1>Application structure</h1>
- <p>Directory layout and file conventions.</p>
-
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
-
- <div class="next-prev">
- <a href="configuration.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Configuration</span>
- </a>
- <a href="routing.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Routing</span>
- </a>
- </div>
- </main>
- </div>
-
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+<div class="next-prev">
+<a href="configuration.html"><span class="label">&larr; Previous</span><span class="title">Configuration</span></a>
+<a href="routing.html" class="next"><span class="label">Next &rarr;</span><span class="title">Routing</span></a>
+</div></main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
