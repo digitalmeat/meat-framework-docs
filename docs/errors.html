@@ -1,45 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Error handling — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Error handling — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Error handling</h1>
+<p>Uses <a href="https://github.com/illuminate/foundation" target="_blank" rel="noopener">illuminate/foundation</a>'s exception handler, registered in <code>app/Exceptions/Handler.php</code>.</p>
+<h2 id="config">Debug mode</h2>
+<pre><code>APP_DEBUG=true   # development — full stack traces
+APP_DEBUG=false  # production — generic error pages</code></pre>
+<div class="callout"><p>Keep <code>APP_DEBUG=false</code> during WordPress installation. PHP 8.x compatibility notices from WordPress core itself can obscure real errors.</p></div>
+<h2 id="handler">Custom handler</h2>
+<pre><code>namespace App\Exceptions;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Throwable;
 
- <main class="docs-content">
- <h1>Error handling</h1>
- <p>Exception handling and error pages.</p>
+class Handler extends ExceptionHandler
+{
+    protected $dontReport = [
+        \Illuminate\Auth\AuthenticationException::class,
+        \Illuminate\Validation\ValidationException::class,
+    ];
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
+    public function report(Throwable $e): void
+    {
+        // Forward to Sentry, Bugsnag, etc.
+        parent::report($e);
+    }
+}</code></pre>
+<h2 id="http">HTTP exceptions</h2>
+<pre><code>abort(404);
+abort(404, 'Post not found.');
+abort_if($post-&gt;status !== 'publish', 403);
+abort_unless(current_user_can('edit_posts'), 403);</code></pre>
+<h2 id="logging">Logging</h2>
+<p>Uses <a href="https://github.com/illuminate/log" target="_blank" rel="noopener">illuminate/log</a> (Monolog). Logs are stored in <code>storage/logs/</code>:</p>
+<pre><code>use Illuminate\Support\Facades\Log;
 
- <div class="next-prev">
- <a href="database.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Database</span>
- </a>
- <div></div>
- </div>
- </main>
- </div>
+Log::info('User registered', ['id' =&gt; $id]);
+Log::warning('Slow query', ['time_ms' =&gt; $ms]);
+Log::error('Payment failed', ['error' =&gt; $e-&gt;getMessage()]);</code></pre>
 
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+<div class="next-prev"><a href="database.html"><span class="label">&larr; Previous</span><span class="title">Database</span></a><a href="introduction.html" class="next"><span class="label">Next &rarr;</span><span class="title">Introduction</span></a></div>
+</main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
