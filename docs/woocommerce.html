@@ -1,48 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>WooCommerce — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>WooCommerce — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>WooCommerce</h1>
+<p>MEAT Framework integrates with WooCommerce by extending the routing conditional tags and allowing WooCommerce templates to use Blade/Twig views.</p>
+<h2 id="routes">WooCommerce routes</h2>
+<p>Register WooCommerce conditional tags in <code>config/app.php</code>:</p>
+<pre><code>// config/app.php
+'conditions' =&gt; [
+    // ... default conditions ...
+    'is_shop'            =&gt; 'shop',
+    'is_product'         =&gt; 'product',
+    'is_product_category' =&gt; 'product-category',
+    'is_product_tag'     =&gt; 'product-tag',
+    'is_cart'            =&gt; 'cart',
+    'is_checkout'        =&gt; 'checkout',
+    'is_account_page'    =&gt; 'account',
+    'is_wc_endpoint_url' =&gt; 'wc-endpoint',
+],</code></pre>
+<p>Then define routes:</p>
+<pre><code>// routes/web.php
 
- <main class="docs-content">
- <h1>WooCommerce</h1>
- <p>WooCommerce integration guide.</p>
+// Shop archive — register BEFORE generic 'page' route
+Route::any('shop', function($post, $query) {
+    return view('woo.shop', ['products' =&gt; wc_get_products(['limit' =&gt; 12])]);
+});
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
+// Single product
+Route::any('product', function($post, $query) {
+    return view('woo.product', ['product' =&gt; wc_get_product($post-&gt;ID)]);
+});
 
- <div class="next-prev">
- <a href="multisite.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Multisite</span>
- </a>
- <a href="wp-cli.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">WP-CLI</span>
- </a>
- </div>
- </main>
- </div>
+// Cart
+Route::any('cart', function($post, $query) {
+    return view('woo.cart');
+});
 
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+// Generic page route LAST
+Route::any('page', function($post, $query) {
+    return view('page', compact('post'));
+});</code></pre>
+<div class="callout"><p>The <code>shop</code> route references a WordPress page. Define it <strong>before</strong> the generic <code>page</code> route or the page route will match first.</p></div>
+<h2 id="templates">WooCommerce template override</h2>
+<p>Override WooCommerce PHP templates by placing them in <code>htdocs/content/themes/my-theme/woocommerce/</code>. This is the standard WooCommerce override mechanism — no framework-specific step needed.</p>
+<h2 id="hooks">WooCommerce hooks</h2>
+<pre><code>// In a Hookable class
+class WooHooks extends Hookable
+{
+    public string $hook = 'woocommerce_init';
+
+    public function register(): void
+    {
+        // Remove default WC actions
+        remove_action('woocommerce_before_main_content', 'woocommerce_output_content_wrapper');
+        remove_action('woocommerce_after_main_content',  'woocommerce_output_content_wrapper_end');
+
+        // Add custom actions
+        add_action('woocommerce_before_shop_loop', function() {
+            echo view('woo.partials.shop-header')-&gt;render();
+        });
+    }
+}</code></pre>
+
+<div class="next-prev"><a href="multisite.html"><span class="label">&larr; Previous</span><span class="title">Multisite</span></a><a href="wp-cli.html" class="next"><span class="label">Next &rarr;</span><span class="title">WP-CLI</span></a></div>
+</main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
