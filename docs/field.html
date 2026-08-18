@@ -1,48 +1,86 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Field — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Field — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Field</h1>
+<p>The <code>Field</code> facade provides a library of reusable form field types used in <a href="metabox.html">Metabox</a>, <a href="page.html">Page</a>, <a href="user.html">User</a>, and <a href="taxonomy.html">Taxonomy</a>.</p>
+<h2 id="types">Available field types</h2>
+<h3>Text inputs</h3>
+<pre><code>Field::text('field_name')
+Field::text('field_name', ['label' =&gt; 'Display Label', 'default' =&gt; 'default value'])
 
- <main class="docs-content">
- <h1>Field</h1>
- <p>Form field registration for custom meta.</p>
+Field::email('contact_email')
+Field::url('website_url', ['rules' =&gt; 'url'])
+Field::number('price', ['rules' =&gt; 'numeric|min:0'])
+Field::integer('quantity')
+Field::password('api_secret')
+Field::color('brand_color', ['default' =&gt; '#e84a4a'])</code></pre>
+<h3>Textarea</h3>
+<pre><code>Field::textarea('description', ['rows' =&gt; 5])
+Field::editor('content')  // WordPress TinyMCE editor</code></pre>
+<h3>Choice fields</h3>
+<pre><code>Field::checkbox('is_featured', ['label' =&gt; 'Feature this post'])
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
+Field::choice('status', [
+    'choices' =&gt; ['Draft', 'Published', 'Archived'],
+])
 
- <div class="next-prev">
- <a href="dropins.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Drop-ins</span>
- </a>
- <a href="filter.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Filter</span>
- </a>
- </div>
- </main>
- </div>
+// Key-value choices
+Field::choice('role', [
+    'choices' =&gt; [
+        'admin'  =&gt; 'Administrator',
+        'editor' =&gt; 'Editor',
+        'viewer' =&gt; 'Viewer',
+    ],
+    'expanded' =&gt; true,  // render as radio buttons
+    'multiple' =&gt; false,
+])
 
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+// Multiple select
+Field::choice('tags', [
+    'choices'  =&gt; ['PHP', 'JavaScript', 'CSS', 'HTML'],
+    'multiple' =&gt; true,
+])</code></pre>
+<h3>Media</h3>
+<pre><code>Field::media('featured_image')  // returns attachment ID
+Field::media('pdf_upload', [
+    'type' =&gt; 'application/pdf',
+    'label' =&gt; 'Upload PDF',
+])</code></pre>
+<h3>Date &amp; time</h3>
+<pre><code>Field::date('event_date')
+Field::date('event_date', ['format' =&gt; 'Y-m-d'])</code></pre>
+<h3>Hidden</h3>
+<pre><code>Field::hidden('_nonce_field', ['value' =&gt; wp_create_nonce('my-action')])</code></pre>
+<h2 id="options">Common options</h2>
+<pre><code>Field::text('name', [
+    'label'       =&gt; 'Display Label',
+    'placeholder' =&gt; 'Enter value here...',
+    'default'     =&gt; 'Default value',
+    'rules'       =&gt; 'required|min:3',
+    'messages'    =&gt; ['required' =&gt; 'This field is required.'],
+    'info'        =&gt; 'Helper text shown below the field.',
+])</code></pre>
+<h2 id="validation">Validation rules</h2>
+<p>Field validation uses <a href="https://laravel.com/docs/validation#available-validation-rules" target="_blank" rel="noopener">illuminate/validation rules</a>. Common ones:</p>
+<pre><code>'rules' =&gt; 'required'
+'rules' =&gt; 'required|min:3|max:100'
+'rules' =&gt; 'email'
+'rules' =&gt; 'url'
+'rules' =&gt; 'numeric|min:0|max:999'
+'rules' =&gt; 'integer'
+'rules' =&gt; 'date'
+'rules' =&gt; 'in:draft,published,archived'</code></pre>
+
+<div class="next-prev"><a href="dropins.html"><span class="label">&larr; Previous</span><span class="title">Drop-ins</span></a><a href="filter.html" class="next"><span class="label">Next &rarr;</span><span class="title">Filter</span></a></div>
+</main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
