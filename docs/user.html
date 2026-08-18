@@ -1,48 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>User — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>User — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>User</h1>
+<p>The <code>User</code> facade adds custom meta fields to WordPress user edit screens.</p>
+<h2 id="current">Current user</h2>
+<pre><code>use Meat\Support\Facades\User;
 
- <main class="docs-content">
- <h1>User</h1>
- <p>User meta and roles management.</p>
+$user  = User::current();
+$id    = User::current()-&gt;ID;
+$email = User::current()-&gt;user_email;
+$roles = User::current()-&gt;roles;
+User::current()-&gt;has_cap('edit_posts');</code></pre>
+<h2 id="meta">Custom user meta fields</h2>
+<pre><code>use Meat\Support\Facades\{User, Field};
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
+User::meta()
+    -&gt;setPrefix('profile_')
+    -&gt;add(Field::text('phone'))
+    -&gt;add(Field::text('company'))
+    -&gt;add(Field::media('avatar_custom'))
+    -&gt;add(Field::choice('department', [
+        'choices' =&gt; ['Engineering', 'Sales', 'Marketing', 'Support'],
+    ]))
+    -&gt;set();</code></pre>
+<h2 id="sections">Grouped fields</h2>
+<pre><code>use Meat\Support\Section;
 
- <div class="next-prev">
- <a href="taxonomy.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Taxonomy</span>
- </a>
- <a href="widgets.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Widgets</span>
- </a>
- </div>
- </main>
- </div>
+User::meta()
+    -&gt;add(new Section('contact', 'Contact', [
+        Field::text('phone'),
+        Field::text('linkedin'),
+    ]))
+    -&gt;add(new Section('profile', 'Profile', [
+        Field::textarea('bio'),
+        Field::media('avatar_custom'),
+    ]))
+    -&gt;set();</code></pre>
+<h2 id="retrieve">Retrieve user meta</h2>
+<pre><code>$phone = get_user_meta($user_id, 'profile_phone', true);
+$bio   = get_user_meta($user_id, 'profile_bio',   true);</code></pre>
+<h2 id="validation">Validation</h2>
+<pre><code>User::meta()
+    -&gt;add(Field::text('website', ['rules' =&gt; 'url']))
+    -&gt;add(Field::text('phone',   ['rules' =&gt; 'required|min:7']))
+    -&gt;set();</code></pre>
 
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+<div class="next-prev"><a href="taxonomy.html"><span class="label">&larr; Previous</span><span class="title">Taxonomy</span></a><a href="widgets.html" class="next"><span class="label">Next &rarr;</span><span class="title">Widgets</span></a></div>
+</main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
