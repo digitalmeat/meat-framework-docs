@@ -1,48 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Filter — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Filter — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Filter</h1>
+<p>The <code>Filter</code> facade wraps the WordPress filter API. Mirrors <a href="action.html">Action</a> with the same API — the key difference is that filter callbacks must <strong>return a value</strong>.</p>
+<h2 id="register">Register a filter</h2>
+<pre><code>use Meat\Support\Facades\Filter;
 
- <main class="docs-content">
- <h1>Filter</h1>
- <p>WordPress filter hooks wrapper.</p>
+Filter::add('the_title', 'App\Hooks\Filters\TitleFilter@process');
+// Omit method when it matches filter name:
+Filter::add('the_title', 'App\Hooks\Filters\TitleFilter');</code></pre>
+<h2 id="priority">Priority &amp; arguments</h2>
+<pre><code>Filter::add('get_attached_file', 'App\Hooks\MyFilter@filter', 5, 2);</code></pre>
+<h2 id="closures">Functions, closures &amp; instances</h2>
+<pre><code>Filter::add('the_content', 'my_filter_fn');
+Filter::add('the_content', function(string $c): string { return $c . '&lt;p&gt;Footer&lt;/p&gt;'; });
+Filter::add('the_title', [$this, 'filterTitle']);
+Filter::add('the_title', [new MyFilter(), 'process']);</code></pre>
+<h2 id="injection">Constructor injection</h2>
+<p>Constructor dependencies are auto-resolved via <a href="https://github.com/illuminate/container" target="_blank" rel="noopener">illuminate/container</a> when using <code>Namespace\Class@method</code>:</p>
+<pre><code>namespace App\Hooks\Modules;
+use App\Services\Editor\Tools; use Illuminate\Http\Request;
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
+class ContentFilter {
+    public function __construct(private Request $r, private Tools $t) {}
+    public function the_content(string $content): string {
+        return $this-&gt;t-&gt;process($content);
+    }
+}
+Filter::add('the_content', 'App\Hooks\Modules\ContentFilter');</code></pre>
+<h2 id="run">Run / check / remove</h2>
+<pre><code>$result = Filter::run('my_filter', $value);
+if (Filter::exists('my_filter')) { /* registered */ }
+$f = Filter::add('the_title', 'SomeClass@method');
+$f-&gt;remove('the_title');            // default priority 10
+$f = Filter::add('the_title', 'SomeClass@method', 5);
+$f-&gt;remove('the_title', 5);         // custom priority</code></pre>
 
- <div class="next-prev">
- <a href="field.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Field</span>
- </a>
- <a href="form.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Form</span>
- </a>
- </div>
- </main>
- </div>
-
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+<div class="next-prev">
+<a href="field.html"><span class="label">&larr; Previous</span><span class="title">Field</span></a>
+<a href="form.html" class="next"><span class="label">Next &rarr;</span><span class="title">Form</span></a>
+</div></main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
