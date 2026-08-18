@@ -1,48 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Action — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Action — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Action</h1>
+<p>The <code>Action</code> facade wraps the WordPress action/hook API. Use <code>add()</code> to register actions.</p>
+<h2 id="register">Register an action</h2>
+<pre><code>use Meat\Support\Facades\Action;
 
- <main class="docs-content">
- <h1>Action</h1>
- <p>WordPress action hooks wrapper.</p>
+Action::add('init', 'App\Hooks\Modules\Shop@init');
+// Omit method when it matches the action name:
+Action::add('init', 'App\Hooks\Modules\Shop');</code></pre>
+<div class="note"><strong>Note:</strong> Always use the full class name with namespace. Methods must be <code>public</code>.</div>
+<h2 id="priority">Priority &amp; argument count</h2>
+<pre><code>// 3rd arg = priority (default 10), 4th = accepted arguments (default 3)
+Action::add('init', 'App\Hooks\MyClass@method', 5, 2);</code></pre>
+<h2 id="closures">Functions, closures &amp; instances</h2>
+<pre><code>Action::add('init', 'my_function');
+Action::add('init', function() { /* code */ });
+Action::add('save_post', [$this, 'onSavePost']);
+Action::add('init', [new MyHandler(), 'handle']);</code></pre>
+<h2 id="injection">Constructor injection</h2>
+<p>When using <code>Namespace\Class@method</code>, constructor dependencies are auto-resolved via <a href="https://github.com/illuminate/container" target="_blank" rel="noopener">illuminate/container</a>:</p>
+<pre><code>namespace App\Hooks\Modules;
+use App\Services\Metrics; use Illuminate\Http\Request;
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
+class Shop {
+    public function __construct(private Request $r, private Metrics $m) {}
+    public function init(): void { /* $this->r and $this->m injected */ }
+}
+Action::add('init', 'App\Hooks\Modules\Shop');</code></pre>
+<h2 id="run">Run / check / remove</h2>
+<pre><code>Action::run('my_action');
+Action::run('my_action', $data);
+if (Action::exists('my_action')) { /* registered */ }
+$a = Action::add('init', 'MyClass@method');
+$a->remove('init');                        // default priority 10
+$a = Action::add('init', 'MyClass@method', 5);
+$a->remove('init', 'MyClass@method', 5);  // custom priority</code></pre>
 
- <div class="next-prev">
- <a href="twig.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Twig</span>
- </a>
- <a href="ajax.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Ajax</span>
- </a>
- </div>
- </main>
- </div>
-
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+<div class="next-prev">
+<a href="twig.html"><span class="label">&larr; Previous</span><span class="title">Twig</span></a>
+<a href="ajax.html" class="next"><span class="label">Next &rarr;</span><span class="title">Ajax</span></a>
+</div></main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
