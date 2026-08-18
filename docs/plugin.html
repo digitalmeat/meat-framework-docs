@@ -1,48 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Plugin handbook — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Plugin handbook — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Plugin handbook</h1>
+<p>MEAT Framework supports custom plugins that use the same application layer as the root project — routing, hooks, views, and Eloquent.</p>
+<h2 id="create">Create a plugin</h2>
+<p>A MEAT Framework plugin is a standard WordPress plugin with an application bootstrap. Create the plugin directory in <code>htdocs/content/plugins/my-plugin/</code>:</p>
+<pre><code>my-plugin/
+├── config/
+│   └── my-plugin.php   # plugin-specific config
+├── resources/
+│   └── views/          # plugin views
+├── routes/
+│   └── routes.php      # plugin routes (override root routes)
+├── app/
+│   ├── Hooks/          # hookable classes
+│   └── Http/
+│       └── Controllers/
+├── my-plugin.php       # WP plugin header + bootstrap
+└── composer.json</code></pre>
+<h2 id="bootstrap">Plugin bootstrap (my-plugin.php)</h2>
+<pre><code>&lt;?php
+/**
+ * Plugin Name: My MEAT Plugin
+ * Description: A plugin using MEAT Framework
+ * Version: 1.0.0
+ */
 
- <main class="docs-content">
- <h1>Plugin handbook</h1>
- <p>Building a MEAT Framework plugin.</p>
+// Register hooks with the application
+add_filter('meat_app_hooks', function(array $hooks): array {
+    $hooks[] = App\Plugins\MyPlugin\Hooks\RegisterPostTypes::class;
+    return $hooks;
+});</code></pre>
+<h2 id="routes">Plugin routes</h2>
+<p>Routes defined in the plugin's <code>routes/routes.php</code> take precedence over the root <code>routes/web.php</code>. Plugin routes are overridden by theme routes.</p>
+<pre><code>// routes/routes.php
+Route::get('my-plugin/api/data', [MyController::class, 'data']);</code></pre>
+<h2 id="assets">Plugin assets</h2>
+<p>Register the plugin's asset directory in its bootstrap:</p>
+<pre><code>add_action('meat_app_assets', function($theme): void {
+    Asset::add('my-plugin-css', 'css/plugin.css', [], '1.0', 'all')
+        -&gt;setLocation(plugin_dir_path(__FILE__) . 'dist', plugin_dir_url(__FILE__) . 'dist')
+        -&gt;to('front');
+});</code></pre>
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
-
- <div class="next-prev">
- <a href="theme.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Theme handbook</span>
- </a>
- <a href="multisite.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Multisite</span>
- </a>
- </div>
- </main>
- </div>
-
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+<div class="next-prev"><a href="theme.html"><span class="label">&larr; Previous</span><span class="title">Theme handbook</span></a><a href="multisite.html" class="next"><span class="label">Next &rarr;</span><span class="title">Multisite</span></a></div>
+</main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
