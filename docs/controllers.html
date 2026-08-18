@@ -20,19 +20,178 @@
       </nav>
     </div>
   </header>
-
   <div class="docs-layout">
     <div id="sidebar-placeholder"></div>
-
     <main class="docs-content">
       <h1>Controllers</h1>
-      <p>Route controllers and resource controllers.</p>
 
-      <div class="note">
-        <strong>Work in progress.</strong> This section is being expanded.
-        The original Themosis 3.1 reference at
-        <a href="https://framework.themosis.com/docs/3.1/controllers" target="_blank" rel="noopener">framework.themosis.com/docs/3.1/controllers</a>
-        remains a valid reference in the meantime.
+      <ul class="toc-list">
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#basic">Basic controllers</a></li>
+        <li><a href="#artisan">Generating controllers</a></li>
+        <li><a href="#single">Single-action controllers</a></li>
+        <li><a href="#middleware">Controller middleware</a></li>
+        <li><a href="#resource">Resource controllers</a></li>
+        <li><a href="#di">Dependency injection</a></li>
+        <li><a href="#cache">Route caching</a></li>
+      </ul>
+
+      <h2 id="introduction">Introduction</h2>
+      <p>
+        Instead of defining all request-handling logic in route closures, you can organize it into
+        Controller classes. Controllers live in <code>app/Http/Controllers/</code> and extend the
+        base <code>Controller</code> class bundled with the framework,
+        which uses <a href="https://github.com/illuminate/routing" target="_blank" rel="noopener">illuminate/routing</a>
+        under the hood.
+      </p>
+
+      <h2 id="artisan">Generating controllers</h2>
+      <pre><code>php artisan make:controller PageController
+
+# Resource controller (index, create, store, show, edit, update, destroy)
+php artisan make:controller PostController --resource
+
+# Invokable (single-action)
+php artisan make:controller ShowProfile --invokable
+
+# Resource + model binding
+php artisan make:controller PostController --resource --model=Post</code></pre>
+
+      <h2 id="basic">Basic controllers</h2>
+      <pre><code>&lt;?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class PageController extends Controller
+{
+    public function index()
+    {
+        return view('home');
+    }
+
+    public function show(Request $request, int $id)
+    {
+        return view('page', ['id' => $id]);
+    }
+}</code></pre>
+
+      <p>Point a route at a controller action:</p>
+      <pre><code>// String syntax
+Route::get('/', 'PageController@index');
+
+// Array syntax (preferred — IDE-friendly)
+use App\Http\Controllers\PageController;
+Route::get('/', [PageController::class, 'index']);</code></pre>
+
+      <h3>WordPress conditional routes with a controller</h3>
+      <p>When a WordPress route needs extra parameters (e.g. a specific page), use the <code>uses</code> key:</p>
+      <pre><code>Route::any('page', ['about-us', 'uses' => [AboutController::class, 'index']]);</code></pre>
+
+      <h3>Nested controllers</h3>
+      <pre><code>// app/Http/Controllers/Admin/UsersController.php
+Route::get('admin/users', 'Admin\UsersController@index');
+
+// or with array syntax
+use App\Http\Controllers\Admin\UsersController;
+Route::get('admin/users', [UsersController::class, 'index']);</code></pre>
+
+      <h2 id="single">Single-action controllers</h2>
+      <pre><code>&lt;?php
+
+namespace App\Http\Controllers;
+
+class ShowProfile extends Controller
+{
+    public function __invoke(int $id)
+    {
+        return view('profile', ['id' => $id]);
+    }
+}</code></pre>
+      <pre><code>Route::get('user/{id}', ShowProfile::class);</code></pre>
+
+      <h2 id="middleware">Controller middleware</h2>
+      <pre><code>// In routes
+Route::get('profile', [UserController::class, 'show'])->middleware('wp.cap');
+
+// In controller constructor (preferred)
+class UserController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('log')->only('index');
+        $this->middleware('subscribed')->except('store');
+    }
+}</code></pre>
+
+      <h2 id="resource">Resource controllers</h2>
+      <pre><code>Route::resource('posts', PostController::class);
+
+// Only specific actions
+Route::resource('posts', PostController::class)->only(['index', 'show']);
+
+// Exclude actions
+Route::resource('posts', PostController::class)->except(['create', 'edit']);
+
+// API resource (no create/edit HTML forms)
+Route::apiResource('posts', PostController::class);</code></pre>
+
+      <p>Actions registered by <code>Route::resource</code>:</p>
+      <table style="width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0 1.5rem">
+        <thead><tr style="border-bottom:1px solid var(--color-border)">
+          <th style="text-align:left;padding:.5rem">Verb</th>
+          <th style="text-align:left;padding:.5rem">URI</th>
+          <th style="text-align:left;padding:.5rem">Action</th>
+          <th style="text-align:left;padding:.5rem">Route name</th>
+        </tr></thead>
+        <tbody style="color:var(--color-text-muted)">
+          <tr><td style="padding:.4rem .5rem">GET</td><td style="padding:.4rem .5rem"><code>/posts</code></td><td style="padding:.4rem .5rem">index</td><td style="padding:.4rem .5rem">posts.index</td></tr>
+          <tr><td style="padding:.4rem .5rem">GET</td><td style="padding:.4rem .5rem"><code>/posts/create</code></td><td style="padding:.4rem .5rem">create</td><td style="padding:.4rem .5rem">posts.create</td></tr>
+          <tr><td style="padding:.4rem .5rem">POST</td><td style="padding:.4rem .5rem"><code>/posts</code></td><td style="padding:.4rem .5rem">store</td><td style="padding:.4rem .5rem">posts.store</td></tr>
+          <tr><td style="padding:.4rem .5rem">GET</td><td style="padding:.4rem .5rem"><code>/posts/{post}</code></td><td style="padding:.4rem .5rem">show</td><td style="padding:.4rem .5rem">posts.show</td></tr>
+          <tr><td style="padding:.4rem .5rem">GET</td><td style="padding:.4rem .5rem"><code>/posts/{post}/edit</code></td><td style="padding:.4rem .5rem">edit</td><td style="padding:.4rem .5rem">posts.edit</td></tr>
+          <tr><td style="padding:.4rem .5rem">PUT/PATCH</td><td style="padding:.4rem .5rem"><code>/posts/{post}</code></td><td style="padding:.4rem .5rem">update</td><td style="padding:.4rem .5rem">posts.update</td></tr>
+          <tr><td style="padding:.4rem .5rem">DELETE</td><td style="padding:.4rem .5rem"><code>/posts/{post}</code></td><td style="padding:.4rem .5rem">destroy</td><td style="padding:.4rem .5rem">posts.destroy</td></tr>
+        </tbody>
+      </table>
+
+      <h2 id="di">Dependency injection</h2>
+      <p>
+        The framework uses the
+        <a href="https://github.com/illuminate/container" target="_blank" rel="noopener">illuminate/container</a>
+        to auto-resolve controller dependencies.
+      </p>
+      <pre><code>&lt;?php
+
+namespace App\Http\Controllers;
+
+use App\Services\BookService;
+use Illuminate\Http\Request;
+
+class HomeController extends Controller
+{
+    // Constructor injection
+    public function __construct(private BookService $books) {}
+
+    // Method injection
+    public function show(Request $request, BookService $books, int $id)
+    {
+        $book = $books->find($id);
+        return view('book', compact('book'));
+    }
+}</code></pre>
+
+      <h2 id="cache">Route caching</h2>
+      <p>For production deployments, cache routes for faster registration (up to 100× speedup):</p>
+      <pre><code># Generate cache (run during deploy)
+php artisan route:cache
+
+# Clear cache (run after adding new routes)
+php artisan route:clear</code></pre>
+      <div class="callout">
+        <p>Route caching only works when all routes use controller classes — closure-based routes cannot be cached.</p>
       </div>
 
       <div class="next-prev">
@@ -45,9 +204,9 @@
           <span class="title">Models</span>
         </a>
       </div>
+
     </main>
   </div>
-
   <script src="../assets/js/sidebar.js"></script>
 </body>
 </html>
