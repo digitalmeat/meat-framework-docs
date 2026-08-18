@@ -1,48 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Widgets — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Widgets — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Widgets</h1>
+<p>The <code>Widget</code> facade registers custom classic WordPress widgets.</p>
+<h2 id="register">Register a widget</h2>
+<pre><code>use Meat\Support\Facades\{Widget, Field};
 
- <main class="docs-content">
- <h1>Widgets</h1>
- <p>WordPress widget registration.</p>
+Widget::make('newsletter', 'Newsletter Signup')
+    -&gt;description('Newsletter signup form widget')
+    -&gt;add(Field::text('title',        ['default' =&gt; 'Subscribe']))
+    -&gt;add(Field::textarea('intro'))
+    -&gt;add(Field::text('button_label', ['default' =&gt; 'Subscribe now']))
+    -&gt;set();</code></pre>
+<h2 id="view">Widget view</h2>
+<p>Create <code>views/widgets/newsletter.blade.php</code>:</p>
+<pre><code>@if($title)
+    &lt;h3 class="widget-title"&gt;{{ $title }}&lt;/h3&gt;
+@endif
+@if($intro)
+    &lt;p&gt;{{ $intro }}&lt;/p&gt;
+@endif
+&lt;form method="post" action="{{ home_url('/newsletter') }}"&gt;
+    @csrf
+    &lt;input type="email" name="email" placeholder="you@example.com" required /&gt;
+    &lt;button type="submit"&gt;{{ $button_label }}&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+<h2 id="areas">Register sidebar areas</h2>
+<pre><code>register_sidebar([
+    'name'          =&gt; 'Primary Sidebar',
+    'id'            =&gt; 'primary-sidebar',
+    'before_widget' =&gt; '&lt;div class="widget %2$s"&gt;',
+    'after_widget'  =&gt; '&lt;/div&gt;',
+    'before_title'  =&gt; '&lt;h3 class="widget-title"&gt;',
+    'after_title'   =&gt; '&lt;/h3&gt;',
+]);</code></pre>
+<h2 id="display">Display in templates</h2>
+<pre><code>@if(is_active_sidebar('primary-sidebar'))
+    &lt;aside class="sidebar"&gt;
+        {!! dynamic_sidebar('primary-sidebar') !!}
+    &lt;/aside&gt;
+@endif</code></pre>
+<div class="note">WordPress 5.8+ added block-based widgets. MEAT Framework's Widget facade targets the classic widget system which remains available.</div>
 
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
-
- <div class="next-prev">
- <a href="user.html">
- <span class="label">&larr; Previous</span>
- <span class="title">User</span>
- </a>
- <a href="theme.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Theme handbook</span>
- </a>
- </div>
- </main>
- </div>
-
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+<div class="next-prev"><a href="user.html"><span class="label">&larr; Previous</span><span class="title">User</span></a><a href="theme.html" class="next"><span class="label">Next &rarr;</span><span class="title">Theme handbook</span></a></div>
+</main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
