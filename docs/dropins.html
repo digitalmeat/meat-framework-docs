@@ -1,48 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Drop-ins — MEAT Framework</title>
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
- <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
- <header class="site-header">
- <div class="container header-inner">
- <a href="../index.html" class="logo">
- <span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span>
- </a>
- <nav class="main-nav">
- <a href="introduction.html">Docs</a>
- <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>
- </nav>
- </div>
- </header>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Drop-ins — MEAT Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+</head><body>
+<header class="site-header"><div class="container header-inner">
+<a href="../index.html" class="logo"><span class="logo-meat">MEAT</span><span class="logo-fw">Framework</span></a>
+<nav class="main-nav"><a href="introduction.html">Docs</a><a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a></nav>
+</div></header>
+<div class="docs-layout"><div id="sidebar-placeholder"></div><main class="docs-content">
 
- <div class="docs-layout">
- <div id="sidebar-placeholder"></div>
+<h1>Drop-ins</h1>
+<p>WordPress drop-ins are PHP files placed in <code>WP_CONTENT_DIR</code> (<code>htdocs/content/</code> in MEAT Framework) that override specific core behaviors.</p>
+<h2 id="list">Available drop-ins</h2>
+<ul>
+  <li><code>db.php</code> — custom database class</li>
+  <li><code>db-error.php</code> — custom database error page</li>
+  <li><code>advanced-cache.php</code> — page caching (required by cache plugins)</li>
+  <li><code>object-cache.php</code> — persistent object cache (Redis, Memcached)</li>
+  <li><code>maintenance.php</code> — custom maintenance page</li>
+  <li><code>fatal-error-handler.php</code> — custom fatal error handler (WP 5.2+)</li>
+</ul>
+<h2 id="placement">Placement</h2>
+<pre><code>htdocs/content/
+├── object-cache.php    # Redis/Memcached drop-in
+├── advanced-cache.php  # Page cache drop-in
+└── themes/
+    └── my-theme/</code></pre>
+<h2 id="redis">Example: Redis object cache</h2>
+<p>Configure in <code>config/wordpress.php</code>:</p>
+<pre><code>define('WP_REDIS_HOST', env('REDIS_HOST', '127.0.0.1'));
+define('WP_REDIS_PORT', env('REDIS_PORT', 6379));
+define('WP_REDIS_DATABASE', env('REDIS_DB', 0));</code></pre>
+<pre><code># .env
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_DB=0</code></pre>
+<div class="note">Drop-ins load before plugins and the application bootstrap — they cannot use the service container or facades.</div>
 
- <main class="docs-content">
- <h1>Drop-ins</h1>
- <p>WordPress drop-in overrides.</p>
-
- <div class="note"><strong>Work in progress.</strong> This section is being expanded. Check back soon or contribute via <a href="https://github.com/digitalmeat/themosis3.0" target="_blank" rel="noopener">GitHub</a>.</div>
-
- <div class="next-prev">
- <a href="asset.html">
- <span class="label">&larr; Previous</span>
- <span class="title">Asset</span>
- </a>
- <a href="field.html" class="next">
- <span class="label">Next &rarr;</span>
- <span class="title">Field</span>
- </a>
- </div>
- </main>
- </div>
-
- <script src="../assets/js/sidebar.js"></script>
-</body>
-</html>
+<div class="next-prev"><a href="asset.html"><span class="label">&larr; Previous</span><span class="title">Asset</span></a><a href="field.html" class="next"><span class="label">Next &rarr;</span><span class="title">Field</span></a></div>
+</main></div>
+<script src="../assets/js/sidebar.js"></script></body></html>
